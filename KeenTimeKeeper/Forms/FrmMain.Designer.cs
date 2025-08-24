@@ -51,6 +51,7 @@
             btnTimerStartCancel.TabIndex = 0;
             btnTimerStartCancel.Text = "Start";
             btnTimerStartCancel.UseVisualStyleBackColor = true;
+            btnTimerStartCancel.Click += BtnTimerStartCancel_Click;
             // 
             // grpTimer
             // 
@@ -96,6 +97,7 @@
             lstTimer.Size = new Size(95, 84);
             lstTimer.TabIndex = 21;
             lstTimer.SelectedIndexChanged += LstTimer_SelectedIndexChanged;
+            lstTimer.KeyUp += LstTimer_KeyUp;
             // 
             // ctxTimerTimes
             // 
