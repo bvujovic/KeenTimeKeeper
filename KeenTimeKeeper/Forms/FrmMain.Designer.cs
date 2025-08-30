@@ -33,7 +33,7 @@
             grpTimer = new GroupBox();
             txtTimerNewTime = new TextBox();
             lblTimerTime = new Label();
-            lstTimer = new ListBox();
+            lstTimerTimes = new ListBox();
             ctxTimerTimes = new ContextMenuStrip(components);
             tsmiTimerRemoveTime = new ToolStripMenuItem();
             timTimer = new System.Windows.Forms.Timer(components);
@@ -58,9 +58,9 @@
             grpTimer.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             grpTimer.Controls.Add(txtTimerNewTime);
             grpTimer.Controls.Add(lblTimerTime);
-            grpTimer.Controls.Add(lstTimer);
+            grpTimer.Controls.Add(lstTimerTimes);
             grpTimer.Controls.Add(btnTimerStartCancel);
-            grpTimer.Location = new Point(327, 12);
+            grpTimer.Location = new Point(25, 12);
             grpTimer.Name = "grpTimer";
             grpTimer.Size = new Size(219, 147);
             grpTimer.TabIndex = 1;
@@ -86,18 +86,19 @@
             lblTimerTime.TabIndex = 22;
             lblTimerTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // lstTimer
+            // lstTimerTimes
             // 
-            lstTimer.ContextMenuStrip = ctxTimerTimes;
-            lstTimer.FormattingEnabled = true;
-            lstTimer.ItemHeight = 20;
-            lstTimer.Items.AddRange(new object[] { "00:05", "01:00", "01:30", "02:00", "04:00", "05:00", "10:00", "15:00" });
-            lstTimer.Location = new Point(6, 26);
-            lstTimer.Name = "lstTimer";
-            lstTimer.Size = new Size(95, 84);
-            lstTimer.TabIndex = 21;
-            lstTimer.SelectedIndexChanged += LstTimer_SelectedIndexChanged;
-            lstTimer.KeyUp += LstTimer_KeyUp;
+            lstTimerTimes.ContextMenuStrip = ctxTimerTimes;
+            lstTimerTimes.FormattingEnabled = true;
+            lstTimerTimes.ItemHeight = 20;
+            lstTimerTimes.Items.AddRange(new object[] { "00:05", "01:00", "01:30", "02:00", "04:00", "05:00", "10:00", "15:00" });
+            lstTimerTimes.Location = new Point(6, 26);
+            lstTimerTimes.Name = "lstTimerTimes";
+            lstTimerTimes.Size = new Size(95, 84);
+            lstTimerTimes.TabIndex = 21;
+            lstTimerTimes.SelectedIndexChanged += LstTimer_SelectedIndexChanged;
+            lstTimerTimes.DoubleClick += LstTimer_DoubleClick;
+            lstTimerTimes.KeyUp += LstTimer_KeyUp;
             // 
             // ctxTimerTimes
             // 
@@ -122,13 +123,16 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(558, 416);
+            ClientSize = new Size(269, 181);
             Controls.Add(grpTimer);
             Font = new Font("Segoe UI", 11.25F);
             Margin = new Padding(4);
+            MaximizeBox = false;
+            MinimumSize = new Size(285, 210);
             Name = "FrmMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Keen TimeKeeper";
+            FormClosing += FrmMain_FormClosing;
             Load += FrmMain_Load;
             grpTimer.ResumeLayout(false);
             grpTimer.PerformLayout();
@@ -141,7 +145,7 @@
         private Button btnTimerStartCancel;
         private GroupBox grpTimer;
         private Label lblTimerTime;
-        private ListBox lstTimer;
+        private ListBox lstTimerTimes;
         private ContextMenuStrip ctxTimerTimes;
         private ToolStripMenuItem tsmiTimerRemoveTime;
         private TextBox txtTimerNewTime;

@@ -6,7 +6,17 @@
 
         public int ElapsedSeconds { get; set; } = 0;
 
-        public bool IsStarted { get; set; } = false;
+        //public bool IsStarted { get; set; } = false;
+        private bool isStarted = false;
+        public bool IsStarted { 
+            get => isStarted;
+            set
+            {
+                isStarted = value;
+                if (!isStarted)
+                    ElapsedSeconds = 0;
+            }
+        }
 
         public int ParseTime(string s, bool acceptTime)
         {
