@@ -85,7 +85,8 @@ namespace KeenTimeKeeper
                 lstTimerTimes.SelectedIndex += d;
             }
             if (e.KeyCode == Keys.Enter && lstTimerTimes.SelectedItem != null)
-                btnTimerStartCancel.PerformClick();
+                //btnTimerStartCancel.PerformClick();
+                StartTimerFromTheList();
         }
 
         private void TimTimer_Tick(object sender, EventArgs e)
@@ -121,6 +122,11 @@ namespace KeenTimeKeeper
 
         private void BtnTimerStartCancel_Click(object sender, EventArgs e)
         {
+            StartStopTimer();
+        }
+
+        private void StartStopTimer()
+        {
             if (!timerKeeper.IsStarted)
                 timerKeeper.ParseTime(lblTimerTime.Text, true);
             else
@@ -130,9 +136,17 @@ namespace KeenTimeKeeper
             TimerBeep();
         }
 
+        private void StartTimerFromTheList()
+        {
+            StartStopTimer();
+            // if first StartStopTimer() call stopped the timer, start it again
+            if (!timerKeeper.IsStarted)
+                StartStopTimer();
+        }
+
         private void LstTimer_DoubleClick(object sender, EventArgs e)
         {
-            btnTimerStartCancel.PerformClick();
+            StartTimerFromTheList();
         }
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)

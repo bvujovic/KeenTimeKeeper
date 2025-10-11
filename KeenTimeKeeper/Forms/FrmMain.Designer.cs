@@ -71,6 +71,7 @@
             // 
             txtTimerNewTime.Location = new Point(6, 114);
             txtTimerNewTime.Name = "txtTimerNewTime";
+            txtTimerNewTime.PlaceholderText = "New Timer";
             txtTimerNewTime.Size = new Size(95, 27);
             txtTimerNewTime.TabIndex = 23;
             txtTimerNewTime.KeyDown += TxtTimerNewTime_KeyDown;
