@@ -29,127 +29,84 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            btnTimerStartCancel = new Button();
-            grpTimer = new GroupBox();
-            txtTimerNewTime = new TextBox();
-            lblTimerTime = new Label();
-            lstTimerTimes = new ListBox();
-            ctxTimerTimes = new ContextMenuStrip(components);
-            tsmiTimerRemoveTime = new ToolStripMenuItem();
-            timTimer = new System.Windows.Forms.Timer(components);
-            grpTimer.SuspendLayout();
-            ctxTimerTimes.SuspendLayout();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
+            ctrlTimer = new KeenTimeKeeper.Controls.CtrlTimer();
+            ctxModes = new ContextMenuStrip(components);
+            tsmiModesTimer = new ToolStripMenuItem();
+            tsmiModesTimeOnTask = new ToolStripMenuItem();
+            ctxModes.SuspendLayout();
             SuspendLayout();
             // 
-            // btnTimerStartCancel
+            // ctrlTimer
             // 
-            btnTimerStartCancel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnTimerStartCancel.Font = new Font("Segoe UI", 14.25F);
-            btnTimerStartCancel.Location = new Point(122, 26);
-            btnTimerStartCancel.Name = "btnTimerStartCancel";
-            btnTimerStartCancel.Size = new Size(91, 45);
-            btnTimerStartCancel.TabIndex = 0;
-            btnTimerStartCancel.Text = "Start";
-            btnTimerStartCancel.UseVisualStyleBackColor = true;
-            btnTimerStartCancel.Click += BtnTimerStartCancel_Click;
+            ctrlTimer.BorderStyle = BorderStyle.FixedSingle;
+            ctrlTimer.Font = new Font("Segoe UI", 11.25F);
+            ctrlTimer.Location = new Point(21, 13);
+            ctrlTimer.Margin = new Padding(3, 4, 3, 4);
+            ctrlTimer.Name = "ctrlTimer";
+            ctrlTimer.Size = new Size(227, 154);
+            ctrlTimer.TabIndex = 0;
+            ctrlTimer.TimesList = new string[]
+    {
+    "00:05",
+    "01:00",
+    "01:30",
+    "02:00",
+    "04:00",
+    "05:00",
+    "10:00",
+    "15:00"
+    };
             // 
-            // grpTimer
+            // ctxModes
             // 
-            grpTimer.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            grpTimer.Controls.Add(txtTimerNewTime);
-            grpTimer.Controls.Add(lblTimerTime);
-            grpTimer.Controls.Add(lstTimerTimes);
-            grpTimer.Controls.Add(btnTimerStartCancel);
-            grpTimer.Location = new Point(25, 12);
-            grpTimer.Name = "grpTimer";
-            grpTimer.Size = new Size(219, 147);
-            grpTimer.TabIndex = 1;
-            grpTimer.TabStop = false;
-            grpTimer.Text = "Timer";
+            ctxModes.Items.AddRange(new ToolStripItem[] { tsmiModesTimer, tsmiModesTimeOnTask });
+            ctxModes.Name = "ctxModes";
+            ctxModes.Size = new Size(143, 48);
             // 
-            // txtTimerNewTime
+            // tsmiModesTimer
             // 
-            txtTimerNewTime.Location = new Point(6, 114);
-            txtTimerNewTime.Name = "txtTimerNewTime";
-            txtTimerNewTime.PlaceholderText = "New Timer";
-            txtTimerNewTime.Size = new Size(95, 27);
-            txtTimerNewTime.TabIndex = 23;
-            txtTimerNewTime.KeyDown += TxtTimerNewTime_KeyDown;
+            tsmiModesTimer.Checked = true;
+            tsmiModesTimer.CheckState = CheckState.Checked;
+            tsmiModesTimer.Name = "tsmiModesTimer";
+            tsmiModesTimer.Size = new Size(142, 22);
+            tsmiModesTimer.Text = "Timer";
+            tsmiModesTimer.Click += TsmiModes_Click;
             // 
-            // lblTimerTime
+            // tsmiModesTimeOnTask
             // 
-            lblTimerTime.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            lblTimerTime.BorderStyle = BorderStyle.FixedSingle;
-            lblTimerTime.Font = new Font("Segoe UI", 14.25F);
-            lblTimerTime.Location = new Point(122, 74);
-            lblTimerTime.Name = "lblTimerTime";
-            lblTimerTime.Size = new Size(91, 36);
-            lblTimerTime.TabIndex = 22;
-            lblTimerTime.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lstTimerTimes
-            // 
-            lstTimerTimes.ContextMenuStrip = ctxTimerTimes;
-            lstTimerTimes.FormattingEnabled = true;
-            lstTimerTimes.ItemHeight = 20;
-            lstTimerTimes.Items.AddRange(new object[] { "00:05", "01:00", "01:30", "02:00", "04:00", "05:00", "10:00", "15:00" });
-            lstTimerTimes.Location = new Point(6, 26);
-            lstTimerTimes.Name = "lstTimerTimes";
-            lstTimerTimes.Size = new Size(95, 84);
-            lstTimerTimes.TabIndex = 21;
-            lstTimerTimes.SelectedIndexChanged += LstTimer_SelectedIndexChanged;
-            lstTimerTimes.DoubleClick += LstTimer_DoubleClick;
-            lstTimerTimes.KeyUp += LstTimer_KeyUp;
-            // 
-            // ctxTimerTimes
-            // 
-            ctxTimerTimes.Items.AddRange(new ToolStripItem[] { tsmiTimerRemoveTime });
-            ctxTimerTimes.Name = "ctxTimerTimes";
-            ctxTimerTimes.Size = new Size(118, 26);
-            ctxTimerTimes.Opening += CtxTimerTimes_Opening;
-            // 
-            // tsmiTimerRemoveTime
-            // 
-            tsmiTimerRemoveTime.Name = "tsmiTimerRemoveTime";
-            tsmiTimerRemoveTime.Size = new Size(117, 22);
-            tsmiTimerRemoveTime.Text = "Remove";
-            tsmiTimerRemoveTime.Click += TsmiTimerRemoveTime_Click;
-            // 
-            // timTimer
-            // 
-            timTimer.Interval = 1000;
-            timTimer.Tick += TimTimer_Tick;
+            tsmiModesTimeOnTask.Name = "tsmiModesTimeOnTask";
+            tsmiModesTimeOnTask.Size = new Size(142, 22);
+            tsmiModesTimeOnTask.Text = "Time on Task";
+            tsmiModesTimeOnTask.Click += TsmiModes_Click;
             // 
             // FrmMain
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(269, 181);
-            Controls.Add(grpTimer);
+            ContextMenuStrip = ctxModes;
+            Controls.Add(ctrlTimer);
             Font = new Font("Segoe UI", 11.25F);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             MaximizeBox = false;
             MinimumSize = new Size(285, 210);
             Name = "FrmMain";
+            Padding = new Padding(16);
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Keen TimeKeeper";
             FormClosing += FrmMain_FormClosing;
             Load += FrmMain_Load;
-            grpTimer.ResumeLayout(false);
-            grpTimer.PerformLayout();
-            ctxTimerTimes.ResumeLayout(false);
+            ctxModes.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
 
-        private Button btnTimerStartCancel;
-        private GroupBox grpTimer;
-        private Label lblTimerTime;
-        private ListBox lstTimerTimes;
-        private ContextMenuStrip ctxTimerTimes;
-        private ToolStripMenuItem tsmiTimerRemoveTime;
-        private TextBox txtTimerNewTime;
-        private System.Windows.Forms.Timer timTimer;
+        private Controls.CtrlTimer ctrlTimer;
+        private ContextMenuStrip ctxModes;
+        private ToolStripMenuItem tsmiModesTimer;
+        private ToolStripMenuItem tsmiModesTimeOnTask;
     }
 }

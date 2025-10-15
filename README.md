@@ -1,7 +1,11 @@
-# KeenTimeKeeper
+﻿# KeenTimeKeeper
 
 ## TODO
-- [x] Save/Load settings in DataSet. ds.xml should be in OneDrive/x/AppData
-- [x] Timer
-	- [x] Improve user interface: double click on task to start/stop, keypress to start/stop
-- [ ] Time on Task
+- [x] Change the structure of the project: controls (modes) are put on main form
+- [x] Add application icon
+- [ ] Time on Task (Time Tracking)
+	- [x] Add switching between controls (modes) to the main form
+	- [ ] FrmTextInput:
+		- [x] Create form with user controls
+		- [ ] Add functionality
+	- [ ] Create functionality based on app Čuvar vremena
