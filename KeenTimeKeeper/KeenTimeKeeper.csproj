@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Classes\Ds.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

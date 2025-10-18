@@ -42,6 +42,7 @@
             // 
             // btnOk
             // 
+            btnOk.DialogResult = DialogResult.OK;
             btnOk.Location = new Point(167, 46);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(75, 26);
@@ -51,6 +52,7 @@
             // 
             // btnCancel
             // 
+            btnCancel.DialogResult = DialogResult.Cancel;
             btnCancel.Location = new Point(248, 46);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 26);
@@ -71,6 +73,7 @@
             Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "FrmTextInput";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "Text Input";
             ResumeLayout(false);
             PerformLayout();

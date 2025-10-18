@@ -1,11 +1,11 @@
 ﻿# KeenTimeKeeper
 
 ## TODO
-- [x] Change the structure of the project: controls (modes) are put on main form
-- [x] Add application icon
 - [ ] Time on Task (Time Tracking)
-	- [x] Add switching between controls (modes) to the main form
-	- [ ] FrmTextInput:
-		- [x] Create form with user controls
-		- [ ] Add functionality
-	- [ ] Create functionality based on app Čuvar vremena
+	- [x] Create functionality based on app Čuvar vremena
+	- [ ] Safety:
+		- [ ] Ask for confirmation before subtracting time (click on Start button again))
+		- [ ] Save current state of the control on app close or mode switch
+- [ ] Adjust size of the form based on current control (mode)
+- [ ] Make base class or interface for user controls
+- [ ] Make common/shared classes for TaskbarManager and Console.Beep that will be used in user controls
