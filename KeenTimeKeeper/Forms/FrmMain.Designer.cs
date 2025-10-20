@@ -30,33 +30,11 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
-            ctrlTimer = new KeenTimeKeeper.Controls.CtrlTimer();
             ctxModes = new ContextMenuStrip(components);
             tsmiModesTimer = new ToolStripMenuItem();
             tsmiModesTimeOnTask = new ToolStripMenuItem();
             ctxModes.SuspendLayout();
             SuspendLayout();
-            // 
-            // ctrlTimer
-            // 
-            ctrlTimer.BorderStyle = BorderStyle.FixedSingle;
-            ctrlTimer.Font = new Font("Segoe UI", 11.25F);
-            ctrlTimer.Location = new Point(21, 13);
-            ctrlTimer.Margin = new Padding(3, 4, 3, 4);
-            ctrlTimer.Name = "ctrlTimer";
-            ctrlTimer.Size = new Size(227, 154);
-            ctrlTimer.TabIndex = 0;
-            ctrlTimer.TimesList = new string[]
-    {
-    "00:05",
-    "01:00",
-    "01:30",
-    "02:00",
-    "04:00",
-    "05:00",
-    "10:00",
-    "15:00"
-    };
             // 
             // ctxModes
             // 
@@ -66,8 +44,6 @@
             // 
             // tsmiModesTimer
             // 
-            tsmiModesTimer.Checked = true;
-            tsmiModesTimer.CheckState = CheckState.Checked;
             tsmiModesTimer.Name = "tsmiModesTimer";
             tsmiModesTimer.Size = new Size(142, 22);
             tsmiModesTimer.Text = "Timer";
@@ -84,14 +60,14 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(269, 181);
             ContextMenuStrip = ctxModes;
-            Controls.Add(ctrlTimer);
             Font = new Font("Segoe UI", 11.25F);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             MaximizeBox = false;
-            MinimumSize = new Size(285, 210);
+            MinimumSize = new Size(200, 100);
             Name = "FrmMain";
             Padding = new Padding(16);
             StartPosition = FormStartPosition.CenterScreen;
@@ -103,8 +79,6 @@
         }
 
         #endregion
-
-        private Controls.CtrlTimer ctrlTimer;
         private ContextMenuStrip ctxModes;
         private ToolStripMenuItem tsmiModesTimer;
         private ToolStripMenuItem tsmiModesTimeOnTask;

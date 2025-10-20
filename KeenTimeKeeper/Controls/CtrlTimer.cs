@@ -1,10 +1,9 @@
 ﻿using KeenTimeKeeper.Classes;
-using System;
 using System.Text.Json;
 
 namespace KeenTimeKeeper.Controls
 {
-    public partial class CtrlTimer : UserControl
+    public partial class CtrlTimer : CtrlMode
     {
         public CtrlTimer()
         {
@@ -156,6 +155,11 @@ namespace KeenTimeKeeper.Controls
         private void LstTimer_DoubleClick(object sender, EventArgs e)
         {
             StartTimerFromTheList();
+        }
+
+        public override void LoadSettings(Ds ds)
+        {
+            throw new NotImplementedException();
         }
     }
 }

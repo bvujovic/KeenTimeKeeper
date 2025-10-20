@@ -1,10 +1,11 @@
-﻿using KeenTimeKeeper.Forms;
+﻿using KeenTimeKeeper.Classes;
+using KeenTimeKeeper.Forms;
 using Microsoft.WindowsAPICodePack.Taskbar;
-using System;
+using System.Diagnostics;
 
 namespace KeenTimeKeeper.Controls
 {
-    public partial class CtrlTimeOnTask : UserControl
+    public partial class CtrlTimeOnTask : CtrlMode
     {
         public CtrlTimeOnTask()
         {
@@ -35,8 +36,8 @@ namespace KeenTimeKeeper.Controls
         private void BtnStart_MouseUp(object sender, MouseEventArgs e)
             => ChangeText(btnStart, e);
 
-        private void ChkPause_MouseUp(object sender, MouseEventArgs e)
-            => ChangeText(chkPause, e);
+        //private void ChkPause_MouseUp(object sender, MouseEventArgs e)
+        //    => ChangeText(chkPause, e);
 
         private void LblCurrentChunkMinutes_MouseUp(object sender, MouseEventArgs e)
         {
@@ -52,10 +53,12 @@ namespace KeenTimeKeeper.Controls
         {
             try
             {
+                var d = TimeChunkMinutes * 60;
                 if (e.Button == MouseButtons.Left)
-                    lblChunkCount.Text = (int.Parse(lblChunkCount.Text) + 1).ToString();
+                    timeInSecs += d;
                 else if (e.Button == MouseButtons.Right)
-                    lblChunkCount.Text = Math.Max(0, int.Parse(lblChunkCount.Text) - 1).ToString();
+                    timeInSecs -= d;
+                DisplayTime();
             }
             catch { MessageBox.Show("Invalid number format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
@@ -65,32 +68,15 @@ namespace KeenTimeKeeper.Controls
         /// <summary>Measured time in seconds.</summary>
         private int timeInSecs;
         private DateTime taskStarted;
-        private bool IsPaused => chkPause.Checked;
+        //private bool isPaused = true;
         private int TimeChunkMinutes => (int)numTimeChunk.Value;
 
         private void BtnStart_Click(object sender, EventArgs e)
         {
-            //* Check if already running and some substantial time has passed (e.g. more than a minute)
-            if (isRunning && timeInSecs >= 60 && !IsPaused)
-            {
-                // Log the time chunk
-                //int chunkMinutes = int.Parse(lblCurrentChunkMinutes.Text);
-                //int chunkCount = int.Parse(lblChunkCount.Text) + 1;
-                //lblChunkCount.Text = chunkCount.ToString();
-                //MessageBox.Show($"Logged {chunkMinutes} minutes for task '{lblTaskName.Text}'. Total chunks: {chunkCount}.", "Time Logged", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
             isRunning = !isRunning;
-            btnStart.Text = isRunning ? "Stop" : "Start";
+            btnStart.Text = isRunning ? "Pause" : "Start";
             tim.Enabled = isRunning;
-
             DisplayStatus();
-        }
-
-        private void ChkPause_CheckedChanged(object sender, EventArgs e)
-        {
-            DisplayStatus();
-            tim.Enabled = isRunning && !IsPaused;
         }
 
         private void Tim_Tick(object sender, EventArgs e)
@@ -98,7 +84,6 @@ namespace KeenTimeKeeper.Controls
             if (isRunning)
             {
                 timeInSecs++;
-                //lblCurrentChunkMinutes.Text = (timeInSecs / 60).ToString();
                 DisplayTime();
                 DisplayStatus();
             }
@@ -112,21 +97,29 @@ namespace KeenTimeKeeper.Controls
             if (seconds == 0)
                 lblCurrentChunkMinutes.Text = (currChunkMinutes).ToString();
             lblChunkCount.Text = (minutes / TimeChunkMinutes).ToString();
+            lblProgress.Text = $"Chunk: {currChunkMinutes}/{TimeChunkMinutes} min, "
+                + $"Total: {minutes} min";
 
-            //var totalTime = DateTime.Now.Subtract(taskStarted);
-            var totalMinutes = (int)DateTime.Now.Subtract(taskStarted).TotalMinutes;
-            var percent = totalMinutes != 0 ? (double)minutes / totalMinutes : 100;
-            lblProgress.Text = $"Working: {currChunkMinutes}/{totalMinutes} min, {percent:P0}";
             //if (TaskbarManager.IsPlatformSupported)
             TaskbarManager.Instance.SetProgressValue(currChunkMinutes, TimeChunkMinutes);
+            Debug.WriteLine(timeInSecs);
         }
 
         private void DisplayStatus()
         {
-            bool isItOn = isRunning && !IsPaused;
+            bool isItOn = isRunning;
             lblTimerStatus.Text = isItOn ? "ON" : "OFF";
             lblTimerStatus.BackColor = isItOn ? Color.LightGreen : Color.Yellow;
             TaskbarManager.Instance.SetProgressState(isItOn ? TaskbarProgressBarState.Normal : TaskbarProgressBarState.Paused);
+        }
+
+        public override void LoadSettings(Ds ds)
+        {
+            lblTaskName.Text = ds.Settings.ReadString(nameof(lblTaskName), lblTaskName.Text)!;
+            btnStart.Text = ds.Settings.ReadString(nameof(btnStart), btnStart.Text)!;
+            numTimeChunk.Value = ds.Settings.ReadInt(nameof(numTimeChunk), (int)numTimeChunk.Value);
+            timeInSecs = ds.Settings.ReadInt(nameof(timeInSecs), 0);
+            DisplayTime();
         }
     }
 }

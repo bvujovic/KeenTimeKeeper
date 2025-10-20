@@ -131,10 +131,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             ContextMenuStrip = ctxEmpty;
             Controls.Add(grpTimer);
-            Font = new Font("Segoe UI", 11.25F);
-            Margin = new Padding(3, 4, 3, 4);
             Name = "CtrlTimer";
-            Size = new Size(227, 154);
+            Size = new Size(237, 154);
             grpTimer.ResumeLayout(false);
             grpTimer.PerformLayout();
             ctxTimerTimes.ResumeLayout(false);
