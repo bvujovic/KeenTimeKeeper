@@ -70,7 +70,7 @@
             MinimumSize = new Size(200, 100);
             Name = "FrmMain";
             Padding = new Padding(16);
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.Manual;
             Text = "Keen TimeKeeper";
             FormClosing += FrmMain_FormClosing;
             Load += FrmMain_Load;

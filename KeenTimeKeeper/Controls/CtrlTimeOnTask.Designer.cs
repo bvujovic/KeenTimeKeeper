@@ -32,6 +32,8 @@
             lblTaskName = new Label();
             ctxEmpty = new ContextMenuStrip(components);
             lblProgress = new Label();
+            ctxReset = new ContextMenuStrip(components);
+            tsmiResetTime = new ToolStripMenuItem();
             lblCurrentChunkMinutes = new Label();
             label2 = new Label();
             label3 = new Label();
@@ -40,6 +42,7 @@
             lblChunkCount = new Label();
             lblTimerStatus = new Label();
             tim = new System.Windows.Forms.Timer(components);
+            ctxReset.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numTimeChunk).BeginInit();
             SuspendLayout();
             // 
@@ -64,18 +67,32 @@
             // lblProgress
             // 
             lblProgress.Anchor = AnchorStyles.Top;
-            lblProgress.AutoSize = true;
+            lblProgress.ContextMenuStrip = ctxReset;
             lblProgress.Font = new Font("Segoe UI", 12F);
-            lblProgress.Location = new Point(17, 38);
+            lblProgress.Location = new Point(44, 41);
             lblProgress.Name = "lblProgress";
-            lblProgress.Size = new Size(203, 21);
+            lblProgress.Size = new Size(148, 21);
             lblProgress.TabIndex = 1;
-            lblProgress.Text = "Chunk: 0/0 min, Total: 0 min";
+            lblProgress.Text = "Total: 0 min";
+            lblProgress.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // ctxReset
+            // 
+            ctxReset.Items.AddRange(new ToolStripItem[] { tsmiResetTime });
+            ctxReset.Name = "ctxReset";
+            ctxReset.Size = new Size(130, 26);
+            // 
+            // tsmiResetTime
+            // 
+            tsmiResetTime.Name = "tsmiResetTime";
+            tsmiResetTime.Size = new Size(129, 22);
+            tsmiResetTime.Text = "Reset time";
+            tsmiResetTime.Click += TsmiResetTime_Click;
             // 
             // lblCurrentChunkMinutes
             // 
             lblCurrentChunkMinutes.Font = new Font("Segoe UI", 12F);
-            lblCurrentChunkMinutes.Location = new Point(44, 73);
+            lblCurrentChunkMinutes.Location = new Point(53, 75);
             lblCurrentChunkMinutes.Name = "lblCurrentChunkMinutes";
             lblCurrentChunkMinutes.Size = new Size(34, 20);
             lblCurrentChunkMinutes.TabIndex = 2;
@@ -87,7 +104,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 12F);
-            label2.Location = new Point(81, 73);
+            label2.Location = new Point(90, 75);
             label2.Name = "label2";
             label2.Size = new Size(16, 21);
             label2.TabIndex = 2;
@@ -97,7 +114,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F);
-            label3.Location = new Point(150, 73);
+            label3.Location = new Point(155, 75);
             label3.Name = "label3";
             label3.Size = new Size(37, 21);
             label3.TabIndex = 2;
@@ -106,19 +123,20 @@
             // numTimeChunk
             // 
             numTimeChunk.Font = new Font("Segoe UI", 12F);
-            numTimeChunk.Location = new Point(98, 71);
+            numTimeChunk.Location = new Point(107, 73);
             numTimeChunk.Maximum = new decimal(new int[] { 60, 0, 0, 0 });
             numTimeChunk.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numTimeChunk.Name = "numTimeChunk";
             numTimeChunk.Size = new Size(46, 29);
             numTimeChunk.TabIndex = 3;
             numTimeChunk.Value = new decimal(new int[] { 10, 0, 0, 0 });
+            numTimeChunk.ValueChanged += NumTimeChunk_ValueChanged;
             // 
             // btnStart
             // 
             btnStart.Anchor = AnchorStyles.Bottom;
             btnStart.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnStart.Location = new Point(81, 113);
+            btnStart.Location = new Point(81, 117);
             btnStart.Name = "btnStart";
             btnStart.Size = new Size(75, 38);
             btnStart.TabIndex = 4;
@@ -132,7 +150,7 @@
             lblChunkCount.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblChunkCount.BorderStyle = BorderStyle.FixedSingle;
             lblChunkCount.Font = new Font("Segoe UI", 12F);
-            lblChunkCount.Location = new Point(3, 127);
+            lblChunkCount.Location = new Point(0, 129);
             lblChunkCount.Name = "lblChunkCount";
             lblChunkCount.Size = new Size(50, 25);
             lblChunkCount.TabIndex = 5;
@@ -146,7 +164,7 @@
             lblTimerStatus.BackColor = Color.LightGreen;
             lblTimerStatus.BorderStyle = BorderStyle.FixedSingle;
             lblTimerStatus.Font = new Font("Segoe UI", 12F);
-            lblTimerStatus.Location = new Point(184, 126);
+            lblTimerStatus.Location = new Point(187, 129);
             lblTimerStatus.Name = "lblTimerStatus";
             lblTimerStatus.Size = new Size(50, 25);
             lblTimerStatus.TabIndex = 7;
@@ -155,7 +173,7 @@
             // 
             // tim
             // 
-            tim.Interval = 1000;
+            tim.Interval = 300;
             tim.Tick += Tim_Tick;
             // 
             // CtrlTimeOnTask
@@ -176,6 +194,7 @@
             Name = "CtrlTimeOnTask";
             Size = new Size(237, 154);
             Load += CtrlTimeOnTask_Load;
+            ctxReset.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)numTimeChunk).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -194,5 +213,7 @@
         private Label lblChunkCount;
         private Label lblTimerStatus;
         private System.Windows.Forms.Timer tim;
+        private ContextMenuStrip ctxReset;
+        private ToolStripMenuItem tsmiResetTime;
     }
 }
