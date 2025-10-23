@@ -65,6 +65,7 @@
             ContextMenuStrip = ctxModes;
             Font = new Font("Segoe UI", 11.25F);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            KeyPreview = true;
             Margin = new Padding(4);
             MaximizeBox = false;
             MinimumSize = new Size(200, 100);
@@ -74,6 +75,7 @@
             Text = "Keen TimeKeeper";
             FormClosing += FrmMain_FormClosing;
             Load += FrmMain_Load;
+            KeyUp += FrmMain_KeyUp;
             ctxModes.ResumeLayout(false);
             ResumeLayout(false);
         }

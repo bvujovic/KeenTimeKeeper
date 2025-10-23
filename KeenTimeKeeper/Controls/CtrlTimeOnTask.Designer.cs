@@ -42,6 +42,7 @@
             lblChunkCount = new Label();
             lblTimerStatus = new Label();
             tim = new System.Windows.Forms.Timer(components);
+            timBtnStart = new System.Windows.Forms.Timer(components);
             ctxReset.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numTimeChunk).BeginInit();
             SuspendLayout();
@@ -68,10 +69,10 @@
             // 
             lblProgress.Anchor = AnchorStyles.Top;
             lblProgress.ContextMenuStrip = ctxReset;
-            lblProgress.Font = new Font("Segoe UI", 12F);
-            lblProgress.Location = new Point(44, 41);
+            lblProgress.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblProgress.Location = new Point(44, 40);
             lblProgress.Name = "lblProgress";
-            lblProgress.Size = new Size(148, 21);
+            lblProgress.Size = new Size(155, 23);
             lblProgress.TabIndex = 1;
             lblProgress.Text = "Total: 0 min";
             lblProgress.TextAlign = ContentAlignment.MiddleRight;
@@ -91,10 +92,10 @@
             // 
             // lblCurrentChunkMinutes
             // 
-            lblCurrentChunkMinutes.Font = new Font("Segoe UI", 12F);
-            lblCurrentChunkMinutes.Location = new Point(53, 75);
+            lblCurrentChunkMinutes.Font = new Font("Segoe UI", 14.25F);
+            lblCurrentChunkMinutes.Location = new Point(50, 75);
             lblCurrentChunkMinutes.Name = "lblCurrentChunkMinutes";
-            lblCurrentChunkMinutes.Size = new Size(34, 20);
+            lblCurrentChunkMinutes.Size = new Size(34, 23);
             lblCurrentChunkMinutes.TabIndex = 2;
             lblCurrentChunkMinutes.Text = "0";
             lblCurrentChunkMinutes.TextAlign = ContentAlignment.MiddleRight;
@@ -103,31 +104,31 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 12F);
-            label2.Location = new Point(90, 75);
+            label2.Font = new Font("Segoe UI", 14.25F);
+            label2.Location = new Point(87, 75);
             label2.Name = "label2";
-            label2.Size = new Size(16, 21);
+            label2.Size = new Size(19, 25);
             label2.TabIndex = 2;
             label2.Text = "/";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 12F);
+            label3.Font = new Font("Segoe UI", 14.25F);
             label3.Location = new Point(155, 75);
             label3.Name = "label3";
-            label3.Size = new Size(37, 21);
+            label3.Size = new Size(44, 25);
             label3.TabIndex = 2;
             label3.Text = "min";
             // 
             // numTimeChunk
             // 
-            numTimeChunk.Font = new Font("Segoe UI", 12F);
+            numTimeChunk.Font = new Font("Segoe UI", 14.25F);
             numTimeChunk.Location = new Point(107, 73);
             numTimeChunk.Maximum = new decimal(new int[] { 60, 0, 0, 0 });
             numTimeChunk.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numTimeChunk.Name = "numTimeChunk";
-            numTimeChunk.Size = new Size(46, 29);
+            numTimeChunk.Size = new Size(46, 33);
             numTimeChunk.TabIndex = 3;
             numTimeChunk.Value = new decimal(new int[] { 10, 0, 0, 0 });
             numTimeChunk.ValueChanged += NumTimeChunk_ValueChanged;
@@ -173,8 +174,13 @@
             // 
             // tim
             // 
-            tim.Interval = 300;
+            tim.Interval = 1000;
             tim.Tick += Tim_Tick;
+            // 
+            // timBtnStart
+            // 
+            timBtnStart.Interval = 500;
+            timBtnStart.Tick += TimBtnStart_Tick;
             // 
             // CtrlTimeOnTask
             // 
@@ -215,5 +221,6 @@
         private System.Windows.Forms.Timer tim;
         private ContextMenuStrip ctxReset;
         private ToolStripMenuItem tsmiResetTime;
+        private System.Windows.Forms.Timer timBtnStart;
     }
 }

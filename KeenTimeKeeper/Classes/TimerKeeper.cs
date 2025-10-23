@@ -6,7 +6,6 @@
 
         public int ElapsedSeconds { get; set; } = 0;
 
-        //public bool IsStarted { get; set; } = false;
         private bool isStarted = false;
         public bool IsStarted { 
             get => isStarted;
@@ -18,7 +17,11 @@
             }
         }
 
-        public int ParseTime(string s, bool acceptTime)
+        /// <summary>Parses time in format 00:00 to seconds.</summary>
+        /// <param name="s">The time string to parse.</param>
+        /// <param name="saveTime">Whether to save the parsed time to TotalSeconds.</param>
+        /// <returns>The parsed time in seconds.</returns>
+        public int ParseTime(string s, bool saveTime)
         {
             if (string.IsNullOrEmpty(s))
                 throw new Exception("Time cannot be empty");
@@ -28,7 +31,7 @@
                 if (parts.Length != 2)
                     throw new Exception("Time format should be 00:00");
                 int secs = int.Parse(parts[0]) * 60 + int.Parse(parts[1]);
-                if (acceptTime)
+                if (saveTime)
                     TotalSeconds = secs;
                 return secs;
             }

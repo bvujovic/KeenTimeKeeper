@@ -16,8 +16,6 @@ namespace KeenTimeKeeper
             try
             {
                 ds.ReadXml(Utils.GetDataSetFileName());
-                var times = ds.Settings.ReadString(nameof(ctrlTimer.TimesList), string.Empty)!;
-
                 var screen = Screen.PrimaryScreen!.WorkingArea;
                 Left = ds.Settings.ReadInt(nameof(Left), Left, it => it >= 0 && it < screen.Width);
                 Top = ds.Settings.ReadInt(nameof(Top), Top, it => it >= 0 && it <= screen.Height);
@@ -27,12 +25,12 @@ namespace KeenTimeKeeper
                 if (strMode != null)
                 {
                     if (strMode.EndsWith(nameof(CtrlTimer)))
-                        //this.Controls.Add(ctrlTimer);
                         tsmiModesTimer.PerformClick();
                     else if (strMode.EndsWith(nameof(CtrlTimeOnTask)))
                         tsmiModesTimeOnTask.PerformClick();
                 }
-                ctrlTimer.LoadTimesList(times);
+                ctrlTimer.LoadSettings(ds);
+                ctrlTimeOnTask.LoadSettings(ds);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             IsLoadFinished = true;
@@ -47,13 +45,15 @@ namespace KeenTimeKeeper
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (!IsLoadFinished) // Loading not finished -> it's not safe to save settings
+                return;
             try
             {
-                var mode = this.Controls.Count > 0 ? this.Controls[0] as CtrlMode : null;
-                var strMode = mode != null ? mode.GetType().ToString() : string.Empty;
+                var ctrl = GetCurrentCtrl();
+                var strMode = ctrl != null ? ctrl.GetType().ToString() : string.Empty;
                 ds.Settings.SaveSetting(nameof(strMode), strMode);
-
-                ds.Settings.SaveSetting(nameof(ctrlTimer.TimesList), JsonSerializer.Serialize(ctrlTimer.TimesList));
+                ctrlTimer.SaveSettings(ds);
+                ctrlTimeOnTask.SaveSettings(ds);
                 if (WindowState == FormWindowState.Normal)
                 {
                     ds.Settings.SaveSetting(nameof(Left), Left.ToString());
@@ -66,6 +66,10 @@ namespace KeenTimeKeeper
 
         private void TsmiModes_Click(object sender, EventArgs e)
         {
+            // Save settings of the current control before switching to another one
+            //var currentCtrl = this.Controls.Count > 0 ? this.Controls[0] as CtrlMode : null;
+            //currentCtrl?.SaveSettings(ds);
+
             CtrlMode? ctrl = null;
             if (sender is ToolStripMenuItem tsmi)
                 foreach (ToolStripMenuItem item in ctxModes.Items)
@@ -86,5 +90,11 @@ namespace KeenTimeKeeper
                 this.Size = new Size(this.Width + dw, this.Height + dh);
             }
         }
+
+        private void FrmMain_KeyUp(object sender, KeyEventArgs e)
+            => GetCurrentCtrl()?.CtrlKeyUp(e);
+
+        private CtrlMode? GetCurrentCtrl()
+            => this.Controls.Count > 0 ? this.Controls[0] as CtrlMode : null;
     }
 }

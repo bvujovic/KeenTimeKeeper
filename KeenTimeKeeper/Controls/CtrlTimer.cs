@@ -69,6 +69,8 @@ namespace KeenTimeKeeper.Controls
                     try
                     {
                         var secs = timerKeeper.ParseTime(txtTimerNewTime.Text, false);
+                        if (secs <= 0)
+                            throw new Exception("Time must be greater than 00:00");
                         lstTimerTimes.Items.Add(TimerKeeper.PrintTime(secs));
                         txtTimerNewTime.Clear();
                     }
@@ -94,17 +96,15 @@ namespace KeenTimeKeeper.Controls
                 StartTimerFromTheList();
         }
 
-        //* ovo bi se moglo izvesti samo ako bi se Escape detektovao na glavnoj formi
-        //* uz KeyPreview = true pa onda da se proslijedi kontroli koja je trenutno aktivna
-        //private void CtrlTimer_KeyUp(object sender, KeyEventArgs e)
-        //{
-        //    if (e.KeyCode == Keys.Escape && timerKeeper.IsStarted)
-        //    {
-        //        StartStopTimer();
-        //        e.Handled = true;
-        //        e.SuppressKeyPress = true;
-        //    }
-        //}
+        public override void CtrlKeyUp(KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape && timerKeeper.IsStarted)
+            {
+                StartStopTimer();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
 
         private void TimTimer_Tick(object sender, EventArgs e)
         {
@@ -159,7 +159,13 @@ namespace KeenTimeKeeper.Controls
 
         public override void LoadSettings(Ds ds)
         {
-            throw new NotImplementedException();
+            var times = ds.Settings.ReadString(nameof(TimesList), string.Empty)!;
+            LoadTimesList(times);
+        }
+
+        public override void SaveSettings(Ds ds)
+        {
+            ds.Settings.SaveSetting(nameof(TimesList), JsonSerializer.Serialize(TimesList));
         }
     }
 }
