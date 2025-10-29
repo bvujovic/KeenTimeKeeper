@@ -7,6 +7,6 @@
 ![TimeOnTask](ScreenShots/TimeOnTask.png)
 
 ## TODO
-- [x] Save/load current state of the controls on app close
-- [x] Add images to README.md
-- [x] Time on Task: Press Enter to start/pause timer
+- [x] Timer mode should also use TaskbarManager.
+- [x] Maybe it would be better if btnStart displays "Resume" when current time is not zero.
+- [ ] Add support for multiple Task names: choose or enter new Task name, save current time for each Task.

@@ -1,4 +1,6 @@
 ﻿using KeenTimeKeeper.Classes;
+using Microsoft.WindowsAPICodePack.Taskbar;
+using System.ComponentModel;
 using System.Text.Json;
 
 namespace KeenTimeKeeper.Controls
@@ -10,16 +12,31 @@ namespace KeenTimeKeeper.Controls
             InitializeComponent();
         }
 
+        private void CtrlTimer_Load(object sender, EventArgs e)
+        {
+            timDelayLoad.Start();
+        }
+
+        private void TimDelayLoad_Tick(object sender, EventArgs e)
+        {
+            if (FrmMain?.IsLoadFinished == true)
+            {
+                TaskbarManager.Instance.SetProgressValue(timerKeeper.ElapsedSeconds, timerKeeper.TotalSeconds);
+                TaskbarManager.Instance.SetProgressState(timerKeeper.IsStarted ? TaskbarProgressBarState.Normal : TaskbarProgressBarState.Paused);
+                timDelayLoad.Stop();
+            }
+        }
+
         private readonly TimerKeeper timerKeeper = new();
 
         public string[] TimesList
         {
-            get { return lstTimerTimes.Items.Cast<string>().ToArray(); }
+            get { return lstTimes.Items.Cast<string>().ToArray(); }
             set
             {
-                lstTimerTimes.Items.Clear();
+                lstTimes.Items.Clear();
                 if (value != null)
-                    lstTimerTimes.Items.AddRange(value);
+                    lstTimes.Items.AddRange(value);
             }
         }
 
@@ -30,49 +47,49 @@ namespace KeenTimeKeeper.Controls
                 var arr = JsonSerializer.Deserialize<string[]>(times);
                 if (arr != null)
                 {
-                    lstTimerTimes.Items.Clear();
-                    lstTimerTimes.Items.AddRange(arr);
+                    lstTimes.Items.Clear();
+                    lstTimes.Items.AddRange(arr);
                 }
             }
-            if (lstTimerTimes.Items.Count > 0)
+            if (lstTimes.Items.Count > 0)
             {
-                lstTimerTimes.SelectedIndex = 0;
-                lstTimerTimes.Focus();
+                lstTimes.SelectedIndex = 0;
+                lstTimes.Focus();
             }
         }
 
-        private void LstTimerTimes_SelectedIndexChanged(object sender, EventArgs e)
+        private void LstTimes_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lstTimerTimes.SelectedItem != null && !timerKeeper.IsStarted)
-                lblTimerTime.Text = lstTimerTimes.SelectedItem.ToString();
+            if (lstTimes.SelectedItem != null && !timerKeeper.IsStarted)
+                lblCurrentTime.Text = lstTimes.SelectedItem.ToString();
         }
 
-        private void CtxTimerTimes_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        private void CtxTimes_Opening(object sender, CancelEventArgs e)
         {
-            tsmiTimerRemoveTime.Enabled = lstTimerTimes.SelectedItem != null;
+            tsmiTimerRemoveTime.Enabled = lstTimes.SelectedItem != null;
         }
 
-        private void TsmiTimerRemoveTime_Click(object sender, EventArgs e)
+        private void TsmiRemoveTime_Click(object sender, EventArgs e)
         {
-            if (lstTimerTimes.SelectedItem != null)
-                lstTimerTimes.Items.Remove(lstTimerTimes.SelectedItem);
+            if (lstTimes.SelectedItem != null)
+                lstTimes.Items.Remove(lstTimes.SelectedItem);
         }
 
-        private void TxtTimerNewTime_KeyDown(object sender, KeyEventArgs e)
+        private void TxtNewTime_KeyDown(object sender, KeyEventArgs e)
         {
             // add time from txt to lst if it's valid (format 00:00)
             if (e.KeyCode == Keys.Enter)
             {
-                if (string.IsNullOrWhiteSpace(txtTimerNewTime.Text))
-                    lstTimerTimes.Focus();
+                if (string.IsNullOrWhiteSpace(txtNewTime.Text))
+                    lstTimes.Focus();
                 else
                     try
                     {
-                        var secs = timerKeeper.ParseTime(txtTimerNewTime.Text, false);
+                        var secs = timerKeeper.ParseTime(txtNewTime.Text, false);
                         if (secs <= 0)
                             throw new Exception("Time must be greater than 00:00");
-                        lstTimerTimes.Items.Add(TimerKeeper.PrintTime(secs));
-                        txtTimerNewTime.Clear();
+                        lstTimes.Items.Add(TimerKeeper.PrintTime(secs));
+                        txtNewTime.Clear();
                     }
                     catch (Exception ex) { MessageBox.Show(ex.Message); }
                 e.Handled = true;
@@ -80,19 +97,19 @@ namespace KeenTimeKeeper.Controls
             }
         }
 
-        private void LstTimerTimes_KeyUp(object sender, KeyEventArgs e)
+        private void LstTimes_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Alt && (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down))
             {
-                if (e.KeyCode == Keys.Up && lstTimerTimes.SelectedIndex == 0
-                    || e.KeyCode == Keys.Down && lstTimerTimes.SelectedIndex == lstTimerTimes.Items.Count - 1)
+                if (e.KeyCode == Keys.Up && lstTimes.SelectedIndex == 0
+                    || e.KeyCode == Keys.Down && lstTimes.SelectedIndex == lstTimes.Items.Count - 1)
                     return;
                 var d = e.KeyCode == Keys.Down ? +1 : -1;
-                var i = lstTimerTimes.SelectedIndex;
-                (lstTimerTimes.Items[i], lstTimerTimes.Items[i + d]) = (lstTimerTimes.Items[i + d], lstTimerTimes.Items[i]);
-                lstTimerTimes.SelectedIndex += d;
+                var i = lstTimes.SelectedIndex;
+                (lstTimes.Items[i], lstTimes.Items[i + d]) = (lstTimes.Items[i + d], lstTimes.Items[i]);
+                lstTimes.SelectedIndex += d;
             }
-            if (e.KeyCode == Keys.Enter && lstTimerTimes.SelectedItem != null)
+            if (e.KeyCode == Keys.Enter && lstTimes.SelectedItem != null)
                 StartTimerFromTheList();
         }
 
@@ -109,14 +126,18 @@ namespace KeenTimeKeeper.Controls
         private void TimTimer_Tick(object sender, EventArgs e)
         {
             timerKeeper.Tick();
-            lblTimerTime.Text = timerKeeper.PrintTime();
+            lblCurrentTime.Text = timerKeeper.PrintTime();
             if (!timerKeeper.IsStarted)
             {
+                TaskbarManager.Instance.SetProgressValue(1, 1);
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
                 timTimer.Stop();
                 Application.DoEvents();
                 TimerBeep(3);
-                btnTimerStartCancel.Text = "Start";
+                btnStartCancel.Text = "Start";
             }
+            TaskbarManager.Instance.SetProgressValue(timerKeeper.ElapsedSeconds, timerKeeper.TotalSeconds);
+            TaskbarManager.Instance.SetProgressState(timerKeeper.IsStarted ? TaskbarProgressBarState.Normal : TaskbarProgressBarState.Paused);
         }
 
         private static void TimerBeep(int count = 1, int itv = 250)
@@ -128,7 +149,7 @@ namespace KeenTimeKeeper.Controls
             }
         }
 
-        private void BtnTimerStartCancel_Click(object sender, EventArgs e)
+        private void BtnStartCancel_Click(object sender, EventArgs e)
         {
             StartStopTimer();
         }
@@ -136,11 +157,11 @@ namespace KeenTimeKeeper.Controls
         private void StartStopTimer()
         {
             if (!timerKeeper.IsStarted)
-                timerKeeper.ParseTime(lblTimerTime.Text, true);
+                timerKeeper.ParseTime(lblCurrentTime.Text, true);
             else
-                lblTimerTime.Text = lstTimerTimes.SelectedItem?.ToString();
+                lblCurrentTime.Text = lstTimes.SelectedItem?.ToString();
             timTimer.Enabled = timerKeeper.IsStarted = !timerKeeper.IsStarted;
-            btnTimerStartCancel.Text = timerKeeper.IsStarted ? "Cancel" : "Start";
+            btnStartCancel.Text = timerKeeper.IsStarted ? "Cancel" : "Start";
             TimerBeep();
         }
 
@@ -152,7 +173,7 @@ namespace KeenTimeKeeper.Controls
                 StartStopTimer();
         }
 
-        private void LstTimer_DoubleClick(object sender, EventArgs e)
+        private void LstTimes_DoubleClick(object sender, EventArgs e)
         {
             StartTimerFromTheList();
         }

@@ -31,7 +31,7 @@
             components = new System.ComponentModel.Container();
             lblTaskName = new Label();
             ctxEmpty = new ContextMenuStrip(components);
-            lblProgress = new Label();
+            lblTotalMinutes = new Label();
             ctxReset = new ContextMenuStrip(components);
             tsmiResetTime = new ToolStripMenuItem();
             lblCurrentChunkMinutes = new Label();
@@ -40,9 +40,10 @@
             numTimeChunk = new NumericUpDown();
             btnStart = new Button();
             lblChunkCount = new Label();
-            lblTimerStatus = new Label();
+            lblTotalTime = new Label();
             tim = new System.Windows.Forms.Timer(components);
             timBtnStart = new System.Windows.Forms.Timer(components);
+            timDelayDisplay = new System.Windows.Forms.Timer(components);
             ctxReset.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numTimeChunk).BeginInit();
             SuspendLayout();
@@ -65,17 +66,17 @@
             ctxEmpty.Name = "ctxTimerTimes";
             ctxEmpty.Size = new Size(61, 4);
             // 
-            // lblProgress
+            // lblTotalMinutes
             // 
-            lblProgress.Anchor = AnchorStyles.Top;
-            lblProgress.ContextMenuStrip = ctxReset;
-            lblProgress.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblProgress.Location = new Point(44, 40);
-            lblProgress.Name = "lblProgress";
-            lblProgress.Size = new Size(155, 23);
-            lblProgress.TabIndex = 1;
-            lblProgress.Text = "Total: 0 min";
-            lblProgress.TextAlign = ContentAlignment.MiddleRight;
+            lblTotalMinutes.Anchor = AnchorStyles.Top;
+            lblTotalMinutes.ContextMenuStrip = ctxReset;
+            lblTotalMinutes.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblTotalMinutes.Location = new Point(44, 40);
+            lblTotalMinutes.Name = "lblTotalMinutes";
+            lblTotalMinutes.Size = new Size(155, 23);
+            lblTotalMinutes.TabIndex = 1;
+            lblTotalMinutes.Text = "Total: 0 min";
+            lblTotalMinutes.TextAlign = ContentAlignment.MiddleRight;
             // 
             // ctxReset
             // 
@@ -129,7 +130,7 @@
             numTimeChunk.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numTimeChunk.Name = "numTimeChunk";
             numTimeChunk.Size = new Size(46, 33);
-            numTimeChunk.TabIndex = 3;
+            numTimeChunk.TabIndex = 2;
             numTimeChunk.Value = new decimal(new int[] { 10, 0, 0, 0 });
             numTimeChunk.ValueChanged += NumTimeChunk_ValueChanged;
             // 
@@ -137,10 +138,10 @@
             // 
             btnStart.Anchor = AnchorStyles.Bottom;
             btnStart.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnStart.Location = new Point(81, 117);
+            btnStart.Location = new Point(73, 117);
             btnStart.Name = "btnStart";
-            btnStart.Size = new Size(75, 38);
-            btnStart.TabIndex = 4;
+            btnStart.Size = new Size(90, 38);
+            btnStart.TabIndex = 0;
             btnStart.Text = "Start";
             btnStart.UseVisualStyleBackColor = true;
             btnStart.Click += BtnStart_Click;
@@ -159,18 +160,18 @@
             lblChunkCount.TextAlign = ContentAlignment.MiddleCenter;
             lblChunkCount.MouseUp += LblChunkCount_MouseUp;
             // 
-            // lblTimerStatus
+            // lblTotalTime
             // 
-            lblTimerStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            lblTimerStatus.BackColor = Color.LightGreen;
-            lblTimerStatus.BorderStyle = BorderStyle.FixedSingle;
-            lblTimerStatus.Font = new Font("Segoe UI", 12F);
-            lblTimerStatus.Location = new Point(187, 129);
-            lblTimerStatus.Name = "lblTimerStatus";
-            lblTimerStatus.Size = new Size(50, 25);
-            lblTimerStatus.TabIndex = 7;
-            lblTimerStatus.Text = "ON";
-            lblTimerStatus.TextAlign = ContentAlignment.MiddleCenter;
+            lblTotalTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lblTotalTime.BackColor = Color.LightGreen;
+            lblTotalTime.BorderStyle = BorderStyle.FixedSingle;
+            lblTotalTime.Font = new Font("Segoe UI", 12F);
+            lblTotalTime.Location = new Point(184, 129);
+            lblTotalTime.Name = "lblTotalTime";
+            lblTotalTime.Size = new Size(53, 25);
+            lblTotalTime.TabIndex = 7;
+            lblTotalTime.Text = "00:00";
+            lblTotalTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // tim
             // 
@@ -182,19 +183,24 @@
             timBtnStart.Interval = 500;
             timBtnStart.Tick += TimBtnStart_Tick;
             // 
+            // timDelayDisplay
+            // 
+            timDelayDisplay.Interval = 250;
+            timDelayDisplay.Tick += TimDelayDisplay_Tick;
+            // 
             // CtrlTimeOnTask
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ContextMenuStrip = ctxEmpty;
-            Controls.Add(lblTimerStatus);
+            Controls.Add(lblTotalTime);
             Controls.Add(lblChunkCount);
             Controls.Add(btnStart);
             Controls.Add(numTimeChunk);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(lblCurrentChunkMinutes);
-            Controls.Add(lblProgress);
+            Controls.Add(lblTotalMinutes);
             Controls.Add(lblTaskName);
             Margin = new Padding(5);
             Name = "CtrlTimeOnTask";
@@ -210,17 +216,18 @@
 
         private Label lblTaskName;
         private ContextMenuStrip ctxEmpty;
-        private Label lblProgress;
+        private Label lblTotalMinutes;
         private Label lblCurrentChunkMinutes;
         private Label label2;
         private Label label3;
         private NumericUpDown numTimeChunk;
         private Button btnStart;
         private Label lblChunkCount;
-        private Label lblTimerStatus;
+        private Label lblTotalTime;
         private System.Windows.Forms.Timer tim;
         private ContextMenuStrip ctxReset;
         private ToolStripMenuItem tsmiResetTime;
         private System.Windows.Forms.Timer timBtnStart;
+        private System.Windows.Forms.Timer timDelayDisplay;
     }
 }

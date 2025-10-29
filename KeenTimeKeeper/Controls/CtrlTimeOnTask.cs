@@ -14,11 +14,11 @@ namespace KeenTimeKeeper.Controls
 
         private void CtrlTimeOnTask_Load(object sender, EventArgs e)
         {
-            DisplayTime();
+            timDelayDisplay.Start();
         }
 
         /// <summary>Changes the text of a control on right-click using a dialog.</summary>
-        private static void ChangeText(Control ctrl, MouseEventArgs e, bool isItInt = false)
+        private void ChangeText(Control ctrl, MouseEventArgs e, bool isItInt = false)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -31,8 +31,14 @@ namespace KeenTimeKeeper.Controls
                     else
                         ctrl.Text = frm.InputText;
                 }
+                lastChangeTextClose = DateTime.Now;
             }
         }
+
+        private DateTime lastChangeTextClose = DateTime.MinValue;
+
+        private bool IsRecentlyChangedText()
+            => (DateTime.Now - lastChangeTextClose).TotalMilliseconds < 250;
 
         private void LblTaskName_MouseUp(object sender, MouseEventArgs e)
         {
@@ -43,6 +49,7 @@ namespace KeenTimeKeeper.Controls
                 if (MessageBox.Show("Do you want to reset time?", "New Task?"
                     , MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     ResetTime();
+                lastChangeTextClose = DateTime.Now;
             }
         }
 
@@ -82,8 +89,7 @@ namespace KeenTimeKeeper.Controls
             catch { MessageBox.Show("Invalid number format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        //private FrmMain FrmMain => this.Parent as FrmMain ?? throw new InvalidOperationException("Parent form is not FrmMain.");
-        private FrmMain? FrmMain => this.Parent as FrmMain;
+        //private FrmMain? FrmMain => this.Parent as FrmMain;
 
         /// <summary>Indicates whether the timer is currently running.</summary>
         private bool isRunning = false;
@@ -99,19 +105,20 @@ namespace KeenTimeKeeper.Controls
             cancelBtnStartClick = true;
             timBtnStart.Start();
             isRunning = !isRunning;
-            btnStart.Text = isRunning ? "Pause" : "Start";
+            //DisplayBtnStartText();
             tim.Enabled = isRunning;
             DisplayTime();
             if (isRunning)
                 FrmMain!.WindowState = FormWindowState.Minimized;
         }
 
+        //void DisplayBtnStartText()
+        //    => btnStart.Text = isRunning ? "Pause" : (timeInSecs == 0 ? "Start" : "Resume");
+
         private bool cancelBtnStartClick = false;
 
         private void TimBtnStart_Tick(object sender, EventArgs e)
-        {
-            cancelBtnStartClick = false;
-        }
+            => cancelBtnStartClick = false;
 
         private void Tim_Tick(object sender, EventArgs e)
         {
@@ -139,17 +146,23 @@ namespace KeenTimeKeeper.Controls
             //if (seconds == 0)
             lblCurrentChunkMinutes.Text = (currChunkMinutes).ToString();
             lblChunkCount.Text = (minutes / TimeChunkMinutes).ToString();
-            lblProgress.Text = $"Total: {minutes} min";
-
+            lblTotalMinutes.Text = $"Total: {minutes} min";
+            btnStart.Text = isRunning ? "Pause" : (timeInSecs == 0 ? "Start" : "Resume");
             var isItOn = isRunning;
-            lblTimerStatus.Text = isItOn ? "ON" : "OFF";
-            lblTimerStatus.BackColor = isItOn ? Color.LightGreen : Color.Yellow;
+            lblTotalTime.Text = $"{timeInSecs / 60}:{timeInSecs % 60:D2}";
+            lblTotalTime.BackColor = isItOn ? Color.LightGreen : Color.Yellow;
             if (FrmMain?.IsLoadFinished == true)
             {
                 TaskbarManager.Instance.SetProgressValue(currChunkMinutes, TimeChunkMinutes);
                 TaskbarManager.Instance.SetProgressState(isItOn ? TaskbarProgressBarState.Normal : TaskbarProgressBarState.Paused);
+                timDelayDisplay.Stop();
             }
             // Debug.WriteLine(timeInSecs);
+        }
+
+        private void TimDelayDisplay_Tick(object sender, EventArgs e)
+        {
+            DisplayTime();
         }
 
         private void NumTimeChunk_ValueChanged(object sender, EventArgs e)
@@ -163,6 +176,7 @@ namespace KeenTimeKeeper.Controls
             lblTaskName.Text = ds.Settings.ReadString(nameof(lblTaskName), lblTaskName.Text)!;
             numTimeChunk.Value = ds.Settings.ReadInt(nameof(numTimeChunk), (int)numTimeChunk.Value);
             DisplayTime();
+            //DisplayBtnStartText();
         }
 
         public override void SaveSettings(Ds ds)
@@ -175,16 +189,20 @@ namespace KeenTimeKeeper.Controls
 
         public override void CtrlKeyUp(KeyEventArgs e)
         {
+            //Debug.WriteLine("CtrlKeyUp enter: " + DateTime.Now);
             // Space for toggling timer, Enter for starting time, Escape for stopping time
             if (e.KeyCode == Keys.Space
-                || e.KeyCode == Keys.Enter && !isRunning
-                || e.KeyCode == Keys.Escape && isRunning)
+                || e.KeyCode == Keys.Enter && !isRunning && !IsRecentlyChangedText()
+                || e.KeyCode == Keys.Escape && isRunning && !IsRecentlyChangedText())
             {
                 btnStart.Focus();
                 btnStart.PerformClick();
-                e.Handled = true;
-                e.SuppressKeyPress = true;
+                //e.Handled = true;
+                //e.SuppressKeyPress = true;
             }
+            if (e.KeyCode == Keys.F2)
+                // ChangeText(lblTaskName, new MouseEventArgs(MouseButtons.Right, 1, 0, 0, 0));
+                LblTaskName_MouseUp(lblTaskName, new MouseEventArgs(MouseButtons.Right, 1, 0, 0, 0));
         }
     }
 }
