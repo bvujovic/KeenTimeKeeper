@@ -20,19 +20,42 @@ namespace KeenTimeKeeper.Controls
         /// <summary>Changes the text of a control on right-click using a dialog.</summary>
         private void ChangeText(Control ctrl, MouseEventArgs e, bool isItInt = false)
         {
-            if (e.Button == MouseButtons.Right)
+            if (e.Button != MouseButtons.Right)
+                return;
+
+            string? caption = null;
+            if (isItInt)
             {
-                var frm = new FrmTextInput(ctrl.Text);
-                if (frm.ShowDialog() == DialogResult.OK)
-                {
-                    if (isItInt && !int.TryParse(frm.InputText, out _))
-                        MessageBox.Show("Invalid number format.", "Error"
-                            , MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    else
-                        ctrl.Text = frm.InputText;
-                }
-                lastChangeTextClose = DateTime.Now;
+                if (ctrl == lblCurrentChunkMinutes)
+                    caption = $"Enter minutes (0-{TimeChunkMinutes - 1})";
+                else
+                    caption = "Enter a number";
             }
+            if (ctrl == lblTaskName)
+                caption = "Select or add new Task";
+            var prevText = lblTaskName.Text;
+            var frm = new FrmTextInput(ctrl.Text, caption);
+            if (ctrl == lblTaskName)
+            {
+                var ti = taskItems.Find(it => it.Name == lblTaskName.Text);
+                if (ti != null)
+                    ti.TimeInSecs = timeInSecs;
+                frm.TaskItems = taskItems;
+            }
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                if (isItInt && !int.TryParse(frm.InputText, out _))
+                    MessageBox.Show("Invalid number format.", "Error"
+                        , MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else
+                    ctrl.Text = frm.InputText;
+                if (ctrl == lblTaskName && lblTaskName.Text != prevText)
+                {
+                    timeInSecs = frm.SelectedTaskTimeInSecs ?? 0;
+                    DisplayTime();
+                }
+            }
+            lastChangeTextClose = DateTime.Now;
         }
 
         private DateTime lastChangeTextClose = DateTime.MinValue;
@@ -42,15 +65,15 @@ namespace KeenTimeKeeper.Controls
 
         private void LblTaskName_MouseUp(object sender, MouseEventArgs e)
         {
-            var prevText = lblTaskName.Text;
+            //var prevText = lblTaskName.Text;
             ChangeText(lblTaskName, e);
-            if (lblTaskName.Text != prevText)
-            {
-                if (MessageBox.Show("Do you want to reset time?", "New Task?"
-                    , MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                    ResetTime();
-                lastChangeTextClose = DateTime.Now;
-            }
+            //if (lblTaskName.Text != prevText)
+            //{
+            //    if (MessageBox.Show("Do you want to reset time?", "New Task?"
+            //        , MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            //        ResetTime();
+            //    lastChangeTextClose = DateTime.Now;
+            //}
         }
 
         private void ResetTime()
@@ -63,9 +86,6 @@ namespace KeenTimeKeeper.Controls
         {
             ResetTime();
         }
-
-        private void BtnStart_MouseUp(object sender, MouseEventArgs e)
-            => ChangeText(btnStart, e);
 
         private void LblCurrentChunkMinutes_MouseUp(object sender, MouseEventArgs e)
         {
@@ -89,8 +109,6 @@ namespace KeenTimeKeeper.Controls
             catch { MessageBox.Show("Invalid number format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        //private FrmMain? FrmMain => this.Parent as FrmMain;
-
         /// <summary>Indicates whether the timer is currently running.</summary>
         private bool isRunning = false;
         /// <summary>Measured time in seconds.</summary>
@@ -105,15 +123,11 @@ namespace KeenTimeKeeper.Controls
             cancelBtnStartClick = true;
             timBtnStart.Start();
             isRunning = !isRunning;
-            //DisplayBtnStartText();
             tim.Enabled = isRunning;
             DisplayTime();
             if (isRunning)
                 FrmMain!.WindowState = FormWindowState.Minimized;
         }
-
-        //void DisplayBtnStartText()
-        //    => btnStart.Text = isRunning ? "Pause" : (timeInSecs == 0 ? "Start" : "Resume");
 
         private bool cancelBtnStartClick = false;
 
@@ -142,14 +156,12 @@ namespace KeenTimeKeeper.Controls
         {
             var minutes = timeInSecs / 60;
             var currChunkMinutes = minutes % TimeChunkMinutes;
-            //var seconds = timeInSecs % 60;
-            //if (seconds == 0)
             lblCurrentChunkMinutes.Text = (currChunkMinutes).ToString();
             lblChunkCount.Text = (minutes / TimeChunkMinutes).ToString();
             lblTotalMinutes.Text = $"Total: {minutes} min";
             btnStart.Text = isRunning ? "Pause" : (timeInSecs == 0 ? "Start" : "Resume");
             var isItOn = isRunning;
-            lblTotalTime.Text = $"{timeInSecs / 60}:{timeInSecs % 60:D2}";
+            lblTotalTime.Text = Utils.SecsToMS(timeInSecs);
             lblTotalTime.BackColor = isItOn ? Color.LightGreen : Color.Yellow;
             if (FrmMain?.IsLoadFinished == true)
             {
@@ -175,21 +187,38 @@ namespace KeenTimeKeeper.Controls
             timeInSecs = ds.Settings.ReadInt(nameof(timeInSecs), 0);
             lblTaskName.Text = ds.Settings.ReadString(nameof(lblTaskName), lblTaskName.Text)!;
             numTimeChunk.Value = ds.Settings.ReadInt(nameof(numTimeChunk), (int)numTimeChunk.Value);
+            var tasks = ds.Settings.ReadGroup(nameof(lblTaskName));
+            foreach (var s in tasks)
+            {
+                taskItems.Add(new TaskItem
+                {
+                    Name = s.Name,
+                    TimeInSecs = int.TryParse(s.Value, out var secs) ? secs : 0
+                });
+            }
+            var t = taskItems.Find(it => it.Name == lblTaskName.Text);
+            if (t != null)
+                timeInSecs = t.TimeInSecs;
             DisplayTime();
-            //DisplayBtnStartText();
         }
+
+        private readonly List<TaskItem> taskItems = [];
 
         public override void SaveSettings(Ds ds)
         {
-            ds.Settings.SaveSetting(nameof(timeInSecs), timeInSecs.ToString());
+            var t = taskItems.Find(it => it.Name == lblTaskName.Text);
+            if (t != null)
+                t.TimeInSecs = timeInSecs;
+            else
+                taskItems.Add(new TaskItem { Name = lblTaskName.Text, TimeInSecs = timeInSecs });
+            foreach (var ti in taskItems)
+                ds.Settings.SaveSetting(nameof(lblTaskName), ti.Name, ti.TimeInSecs.ToString());
             ds.Settings.SaveSetting(nameof(lblTaskName), lblTaskName.Text);
-            ds.Settings.SaveSetting(nameof(btnStart), btnStart.Text);
             ds.Settings.SaveSetting(nameof(numTimeChunk), numTimeChunk.Value.ToString());
         }
 
         public override void CtrlKeyUp(KeyEventArgs e)
         {
-            //Debug.WriteLine("CtrlKeyUp enter: " + DateTime.Now);
             // Space for toggling timer, Enter for starting time, Escape for stopping time
             if (e.KeyCode == Keys.Space
                 || e.KeyCode == Keys.Enter && !isRunning && !IsRecentlyChangedText()
@@ -201,7 +230,6 @@ namespace KeenTimeKeeper.Controls
                 //e.SuppressKeyPress = true;
             }
             if (e.KeyCode == Keys.F2)
-                // ChangeText(lblTaskName, new MouseEventArgs(MouseButtons.Right, 1, 0, 0, 0));
                 LblTaskName_MouseUp(lblTaskName, new MouseEventArgs(MouseButtons.Right, 1, 0, 0, 0));
         }
     }

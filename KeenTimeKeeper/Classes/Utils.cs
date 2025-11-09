@@ -26,5 +26,12 @@
                 SetOneDriveAppFolder();
             return Path.Combine(folders[idxFolder], dataSetFileName);
         }
+
+        public static string SecsToMS(int totalSecs)
+        {
+            int mins = totalSecs / 60;
+            int secs = totalSecs % 60;
+            return $"{mins:D2}:{secs:D2}";
+        }
     }
 }

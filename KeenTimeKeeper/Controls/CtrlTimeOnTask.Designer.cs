@@ -145,7 +145,6 @@
             btnStart.Text = "Start";
             btnStart.UseVisualStyleBackColor = true;
             btnStart.Click += BtnStart_Click;
-            btnStart.MouseUp += BtnStart_MouseUp;
             // 
             // lblChunkCount
             // 

@@ -31,10 +31,13 @@
             txt = new TextBox();
             btnOk = new Button();
             btnCancel = new Button();
+            lblValue = new Label();
+            cmbList = new ComboBox();
             SuspendLayout();
             // 
             // txt
             // 
+            txt.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txt.Location = new Point(12, 12);
             txt.Name = "txt";
             txt.Size = new Size(311, 25);
@@ -42,23 +45,46 @@
             // 
             // btnOk
             // 
+            btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnOk.DialogResult = DialogResult.OK;
             btnOk.Location = new Point(167, 46);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(75, 26);
-            btnOk.TabIndex = 1;
+            btnOk.TabIndex = 2;
             btnOk.Text = "OK";
             btnOk.UseVisualStyleBackColor = true;
             // 
             // btnCancel
             // 
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
             btnCancel.Location = new Point(248, 46);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 26);
-            btnCancel.TabIndex = 2;
+            btnCancel.TabIndex = 3;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
+            // 
+            // lblValue
+            // 
+            lblValue.AutoSize = true;
+            lblValue.Location = new Point(12, 51);
+            lblValue.Name = "lblValue";
+            lblValue.Size = new Size(13, 17);
+            lblValue.TabIndex = 3;
+            lblValue.Text = "/";
+            // 
+            // cmbList
+            // 
+            cmbList.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            cmbList.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cmbList.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cmbList.FormattingEnabled = true;
+            cmbList.Location = new Point(12, 18);
+            cmbList.Name = "cmbList";
+            cmbList.Size = new Size(311, 25);
+            cmbList.TabIndex = 1;
+            cmbList.SelectedIndexChanged += CmbList_SelectedIndexChanged;
             // 
             // FrmTextInput
             // 
@@ -67,6 +93,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(335, 81);
+            Controls.Add(cmbList);
+            Controls.Add(lblValue);
             Controls.Add(btnCancel);
             Controls.Add(btnOk);
             Controls.Add(txt);
@@ -84,5 +112,7 @@
         private TextBox txt;
         private Button btnOk;
         private Button btnCancel;
+        private Label lblValue;
+        private ComboBox cmbList;
     }
 }

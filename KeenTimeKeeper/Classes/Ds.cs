@@ -12,6 +12,11 @@ namespace KeenTimeKeeper.Classes
 
         partial class SettingsDataTable
         {
+            public void SaveSetting(string group, string name, string? value)
+            {
+                SaveSetting($"{group}.{name}", value);
+            }
+
             public void SaveSetting(string name, string? value)
             {
                 var sett = FindByName(name);
@@ -26,9 +31,31 @@ namespace KeenTimeKeeper.Classes
                     if (sett.RowState == DataRowState.Detached)
                         AddSettingsRow(sett);
                 }
-                //? ovo ispod mozda nije neophodno
+                //? this code might not be necessary
                 else if (sett.RowState != DataRowState.Detached)
                     RemoveSettingsRow(sett);
+            }
+
+            /// <summary>Read list values from the group</summary>
+            /// <example>
+            /// TN.RAF:600
+            /// TN.prog:0
+            ///</example>
+            public List<SettingsRow> ReadGroup(string group)
+            {
+                var list = new List<SettingsRow>();
+                var prefix = $"{group}.";
+                foreach (SettingsRow s in Rows)
+                    if (s.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var t = NewSettingsRow();
+                        t.Name = s.Name[prefix.Length..];
+                        t.Value = s.Value;
+                        list.Add(t);
+                        //s.Name = s.Name[prefix.Length..];
+                        //list.Add(s);
+                    }
+                return list;
             }
 
             public int ReadInt(string name, int defValue, Func<int, bool>? checkMethod = null)

@@ -7,6 +7,6 @@
 ![TimeOnTask](ScreenShots/TimeOnTask.png)
 
 ## TODO
-- [x] Timer mode should also use TaskbarManager.
-- [x] Maybe it would be better if btnStart displays "Resume" when current time is not zero.
-- [ ] Add support for multiple Task names: choose or enter new Task name, save current time for each Task.
+- [x] Add support for multiple Task names: choose or enter new Task name, save current time for each Task.
+	- [ ] Check if adding new Task name works well.
+	- [ ] Implement deletion of saved Task times.
