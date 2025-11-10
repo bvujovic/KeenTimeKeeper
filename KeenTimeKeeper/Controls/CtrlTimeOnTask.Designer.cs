@@ -71,12 +71,13 @@
             lblTotalMinutes.Anchor = AnchorStyles.Top;
             lblTotalMinutes.ContextMenuStrip = ctxReset;
             lblTotalMinutes.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblTotalMinutes.Location = new Point(44, 40);
+            lblTotalMinutes.Location = new Point(53, 40);
             lblTotalMinutes.Name = "lblTotalMinutes";
             lblTotalMinutes.Size = new Size(155, 23);
             lblTotalMinutes.TabIndex = 1;
             lblTotalMinutes.Text = "Total: 0 min";
             lblTotalMinutes.TextAlign = ContentAlignment.MiddleRight;
+            lblTotalMinutes.Visible = false;
             // 
             // ctxReset
             // 
@@ -94,7 +95,7 @@
             // lblCurrentChunkMinutes
             // 
             lblCurrentChunkMinutes.Font = new Font("Segoe UI", 14.25F);
-            lblCurrentChunkMinutes.Location = new Point(50, 75);
+            lblCurrentChunkMinutes.Location = new Point(59, 75);
             lblCurrentChunkMinutes.Name = "lblCurrentChunkMinutes";
             lblCurrentChunkMinutes.Size = new Size(34, 23);
             lblCurrentChunkMinutes.TabIndex = 2;
@@ -106,7 +107,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 14.25F);
-            label2.Location = new Point(87, 75);
+            label2.Location = new Point(96, 75);
             label2.Name = "label2";
             label2.Size = new Size(19, 25);
             label2.TabIndex = 2;
@@ -116,7 +117,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 14.25F);
-            label3.Location = new Point(155, 75);
+            label3.Location = new Point(164, 75);
             label3.Name = "label3";
             label3.Size = new Size(44, 25);
             label3.TabIndex = 2;
@@ -125,7 +126,7 @@
             // numTimeChunk
             // 
             numTimeChunk.Font = new Font("Segoe UI", 14.25F);
-            numTimeChunk.Location = new Point(107, 73);
+            numTimeChunk.Location = new Point(116, 73);
             numTimeChunk.Maximum = new decimal(new int[] { 60, 0, 0, 0 });
             numTimeChunk.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numTimeChunk.Name = "numTimeChunk";
@@ -150,10 +151,10 @@
             // 
             lblChunkCount.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblChunkCount.BorderStyle = BorderStyle.FixedSingle;
-            lblChunkCount.Font = new Font("Segoe UI", 12F);
-            lblChunkCount.Location = new Point(0, 129);
+            lblChunkCount.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblChunkCount.Location = new Point(0, 117);
             lblChunkCount.Name = "lblChunkCount";
-            lblChunkCount.Size = new Size(50, 25);
+            lblChunkCount.Size = new Size(53, 37);
             lblChunkCount.TabIndex = 5;
             lblChunkCount.Text = "0";
             lblChunkCount.TextAlign = ContentAlignment.MiddleCenter;
@@ -164,10 +165,11 @@
             lblTotalTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             lblTotalTime.BackColor = Color.LightGreen;
             lblTotalTime.BorderStyle = BorderStyle.FixedSingle;
+            lblTotalTime.ContextMenuStrip = ctxReset;
             lblTotalTime.Font = new Font("Segoe UI", 12F);
-            lblTotalTime.Location = new Point(184, 129);
+            lblTotalTime.Location = new Point(184, 117);
             lblTotalTime.Name = "lblTotalTime";
-            lblTotalTime.Size = new Size(53, 25);
+            lblTotalTime.Size = new Size(53, 37);
             lblTotalTime.TabIndex = 7;
             lblTotalTime.Text = "00:00";
             lblTotalTime.TextAlign = ContentAlignment.MiddleCenter;

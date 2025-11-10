@@ -33,6 +33,7 @@
             btnCancel = new Button();
             lblValue = new Label();
             cmbList = new ComboBox();
+            btnListRemove = new Button();
             SuspendLayout();
             // 
             // txt
@@ -82,9 +83,21 @@
             cmbList.FormattingEnabled = true;
             cmbList.Location = new Point(12, 18);
             cmbList.Name = "cmbList";
-            cmbList.Size = new Size(311, 25);
+            cmbList.Size = new Size(281, 25);
             cmbList.TabIndex = 1;
             cmbList.SelectedIndexChanged += CmbList_SelectedIndexChanged;
+            // 
+            // btnListRemove
+            // 
+            btnListRemove.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnListRemove.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnListRemove.Location = new Point(293, 18);
+            btnListRemove.Name = "btnListRemove";
+            btnListRemove.Size = new Size(30, 25);
+            btnListRemove.TabIndex = 4;
+            btnListRemove.Text = "X";
+            btnListRemove.UseVisualStyleBackColor = true;
+            btnListRemove.Click += BtnListRemove_Click;
             // 
             // FrmTextInput
             // 
@@ -93,6 +106,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(335, 81);
+            Controls.Add(btnListRemove);
             Controls.Add(cmbList);
             Controls.Add(lblValue);
             Controls.Add(btnCancel);
@@ -114,5 +128,6 @@
         private Button btnCancel;
         private Label lblValue;
         private ComboBox cmbList;
+        private Button btnListRemove;
     }
 }

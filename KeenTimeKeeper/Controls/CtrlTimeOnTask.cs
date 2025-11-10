@@ -40,17 +40,27 @@ namespace KeenTimeKeeper.Controls
                 var ti = taskItems.Find(it => it.Name == lblTaskName.Text);
                 if (ti != null)
                     ti.TimeInSecs = timeInSecs;
-                frm.TaskItems = taskItems;
+                frm.TaskItems = taskItems = taskItems.OrderByDescending(it => it.LastUsed).ToList();
             }
             if (frm.ShowDialog() == DialogResult.OK)
             {
-                if (isItInt && !int.TryParse(frm.InputText, out _))
-                    MessageBox.Show("Invalid number format.", "Error"
-                        , MessageBoxButtons.OK, MessageBoxIcon.Error);
-                else
-                    ctrl.Text = frm.InputText;
-                if (ctrl == lblTaskName && lblTaskName.Text != prevText)
+                if (isItInt)
                 {
+                    if (!int.TryParse(frm.InputText, out int val))
+                        MessageBox.Show("Invalid number format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    else if (ctrl == lblCurrentChunkMinutes && (val < 0 || val >= TimeChunkMinutes))
+                        MessageBox.Show($"Value must be between 0 and {TimeChunkMinutes - 1}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    else
+                        ctrl.Text = val.ToString();
+                }
+                //else
+                //    ctrl.Text = frm.InputText;
+                if (ctrl == lblTaskName && prevText != frm.InputText)
+                {
+                    var t = taskItems.Find(it => it.Name == frm.InputText);
+                    if (t != null)
+                        t.LastUsed = DateTime.Now;
+                    ctrl.Text = frm.InputText;
                     timeInSecs = frm.SelectedTaskTimeInSecs ?? 0;
                     DisplayTime();
                 }
@@ -190,11 +200,9 @@ namespace KeenTimeKeeper.Controls
             var tasks = ds.Settings.ReadGroup(nameof(lblTaskName));
             foreach (var s in tasks)
             {
-                taskItems.Add(new TaskItem
-                {
-                    Name = s.Name,
-                    TimeInSecs = int.TryParse(s.Value, out var secs) ? secs : 0
-                });
+                var ti = new TaskItem { Name = s.Name };
+                ti.FromValueString(s.Value);
+                taskItems.Add(ti);
             }
             var t = taskItems.Find(it => it.Name == lblTaskName.Text);
             if (t != null)
@@ -202,7 +210,7 @@ namespace KeenTimeKeeper.Controls
             DisplayTime();
         }
 
-        private readonly List<TaskItem> taskItems = [];
+        private List<TaskItem> taskItems = [];
 
         public override void SaveSettings(Ds ds)
         {
@@ -210,9 +218,18 @@ namespace KeenTimeKeeper.Controls
             if (t != null)
                 t.TimeInSecs = timeInSecs;
             else
-                taskItems.Add(new TaskItem { Name = lblTaskName.Text, TimeInSecs = timeInSecs });
-            foreach (var ti in taskItems)
-                ds.Settings.SaveSetting(nameof(lblTaskName), ti.Name, ti.TimeInSecs.ToString());
+                taskItems.Add(new TaskItem { Name = lblTaskName.Text, TimeInSecs = timeInSecs, LastUsed = DateTime.Now });
+            //foreach (var ti in taskItems)
+            //    ds.Settings.SaveSetting(nameof(lblTaskName), ti.Name, ti.TimeInSecs.ToString());
+            ds.Settings.SaveGroup(nameof(lblTaskName), taskItems
+                .Select(ti =>
+                {
+                    var s = ds.Settings.NewSettingsRow();
+                    s.Name = ti.Name;
+                    //s.Value = ti.TimeInSecs.ToString();
+                    s.Value = ti.ToValueString();
+                    return s;
+                }).ToList());
             ds.Settings.SaveSetting(nameof(lblTaskName), lblTaskName.Text);
             ds.Settings.SaveSetting(nameof(numTimeChunk), numTimeChunk.Value.ToString());
         }

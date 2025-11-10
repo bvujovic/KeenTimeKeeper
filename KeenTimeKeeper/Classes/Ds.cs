@@ -58,6 +58,21 @@ namespace KeenTimeKeeper.Classes
                 return list;
             }
 
+            public void SaveGroup(string group, List<SettingsRow> list)
+            {
+                var prefix = $"{group}.";
+                // remove old
+                var toRemove = new List<SettingsRow>();
+                foreach (SettingsRow s in Rows)
+                    if (s.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                        toRemove.Add(s);
+                foreach (var s in toRemove)
+                    RemoveSettingsRow(s);
+                // add new
+                foreach (var s in list)
+                    SaveSetting($"{group}.{s.Name}", s.Value);
+            }
+
             public int ReadInt(string name, int defValue, Func<int, bool>? checkMethod = null)
             {
                 var s = FindByName(name);
