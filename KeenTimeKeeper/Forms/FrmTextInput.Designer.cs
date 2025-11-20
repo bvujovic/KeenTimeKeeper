@@ -28,12 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             txt = new TextBox();
             btnOk = new Button();
             btnCancel = new Button();
             lblValue = new Label();
             cmbList = new ComboBox();
             btnListRemove = new Button();
+            timDelayDisplay = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // txt
@@ -86,6 +88,7 @@
             cmbList.Size = new Size(281, 25);
             cmbList.TabIndex = 1;
             cmbList.SelectedIndexChanged += CmbList_SelectedIndexChanged;
+            cmbList.TextUpdate += CmbList_TextUpdate;
             // 
             // btnListRemove
             // 
@@ -98,6 +101,11 @@
             btnListRemove.Text = "X";
             btnListRemove.UseVisualStyleBackColor = true;
             btnListRemove.Click += BtnListRemove_Click;
+            // 
+            // timDelayDisplay
+            // 
+            timDelayDisplay.Interval = 500;
+            timDelayDisplay.Tick += TimDelayDisplay_Tick;
             // 
             // FrmTextInput
             // 
@@ -129,5 +137,6 @@
         private Label lblValue;
         private ComboBox cmbList;
         private Button btnListRemove;
+        private System.Windows.Forms.Timer timDelayDisplay;
     }
 }

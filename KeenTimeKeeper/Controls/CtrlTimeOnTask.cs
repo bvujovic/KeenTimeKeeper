@@ -94,6 +94,8 @@ namespace KeenTimeKeeper.Controls
 
         private void TsmiResetTime_Click(object sender, EventArgs e)
         {
+            if (isRunning)
+                btnStart.PerformClick();
             ResetTime();
         }
 
@@ -168,7 +170,7 @@ namespace KeenTimeKeeper.Controls
             var currChunkMinutes = minutes % TimeChunkMinutes;
             lblCurrentChunkMinutes.Text = (currChunkMinutes).ToString();
             lblChunkCount.Text = (minutes / TimeChunkMinutes).ToString();
-            lblTotalMinutes.Text = $"Total: {minutes} min";
+            //lblTotalMinutes.Text = $"Total: {minutes} min";
             btnStart.Text = isRunning ? "Pause" : (timeInSecs == 0 ? "Start" : "Resume");
             var isItOn = isRunning;
             lblTotalTime.Text = Utils.SecsToMS(timeInSecs);

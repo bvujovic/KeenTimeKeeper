@@ -9,7 +9,7 @@ namespace KeenTimeKeeper.Controls
             InitializeComponent();
         }
 
-        protected FrmMain? FrmMain => this.Parent as FrmMain;
+        protected FrmMain? FrmMain => this.Parent?.Parent as FrmMain;
 
         public virtual void LoadSettings(Ds ds) { }
 

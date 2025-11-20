@@ -41,6 +41,8 @@ namespace KeenTimeKeeper.Forms
                 cmbList.DisplayMember = "Name";
                 cmbList.SelectedIndex = 0;
                 cmbList.Show();
+                //cmbList.DroppedDown = true;
+                timDelayDisplay.Start();
                 btnListRemove.Show();
                 txt.Hide();
                 isListMode = true;
@@ -56,6 +58,12 @@ namespace KeenTimeKeeper.Forms
                 lblValue.Text = Utils.SecsToMS(it.TimeInSecs);
             else
                 lblValue.Text = "";
+        }
+
+        // Clear label when text is updated manually (not selected from list)
+        private void CmbList_TextUpdate(object sender, EventArgs e)
+        {
+            lblValue.Text = "";
         }
 
         private void BtnListRemove_Click(object sender, EventArgs e)
@@ -76,6 +84,12 @@ namespace KeenTimeKeeper.Forms
             {
                 MessageBox.Show($"Error removing item: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void TimDelayDisplay_Tick(object sender, EventArgs e)
+        {
+            timDelayDisplay.Stop();
+            cmbList.DroppedDown = true;
         }
     }
 }

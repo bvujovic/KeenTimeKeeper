@@ -7,7 +7,10 @@
 ![TimeOnTask](ScreenShots/TimeOnTask.png)
 
 ## TODO
-- [x] Add support for multiple Task names: choose or enter new Task name, save current time for each Task.
-	- [x] Check if adding new Task name works well.
-	- [x] Implement deletion of saved Task times.
-	- [x] Task should be sorted so that most recently used Task is on the top of the list.
+- [x] Revert menu with options to context menu that opens on right click on the sides of FrmMain.
+- [ ] StartTimerClicked for (some) mode controls:
+	- [ ] Make it work for CtrlTimerOnTask and CtrlTimer.
+	- [ ] If the value is other then Never, restore FrmMain window after timer is stopped.
+- [x] Total time does not look good when minutes are greater than 99. It should be displayed in hours then and the control should be wider.
+- [ ] Maybe chunk time should be saved in settings for each task separately.
+- [ ] CtrlTimerOnTask shoud have an option for automatic click on Start/Resume button.

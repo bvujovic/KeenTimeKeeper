@@ -31,7 +31,23 @@
         {
             int mins = totalSecs / 60;
             int secs = totalSecs % 60;
-            return $"{mins:D2}:{secs:D2}";
+            if(mins < 60)
+                return $"{mins:D2}:{secs:D2}";
+            else
+            {
+                int hours = mins / 60;
+                mins %= 60;
+                return $"{hours}:{mins:D2}:{secs:D2}";
+            }
         }
+    }
+
+    public enum MinimizeOnStartTime
+    {
+        Immediately,
+        After1Sec,
+        After2Secs,
+        After5Secs,
+        Never
     }
 }
