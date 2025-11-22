@@ -16,5 +16,11 @@ namespace KeenTimeKeeper.Controls
         public virtual void SaveSettings(Ds ds) { }
 
         public virtual void CtrlKeyUp(KeyEventArgs e) { }
+
+        public event EventHandler? StartTimerClicked;
+        protected void OnStartTimerClicked() => StartTimerClicked?.Invoke(this, EventArgs.Empty);
+
+        public event EventHandler? TimerEnded;
+        protected void OnTimerEnded() => TimerEnded?.Invoke(this, EventArgs.Empty);
     }
 }

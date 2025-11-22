@@ -129,6 +129,7 @@ namespace KeenTimeKeeper.Controls
             lblCurrentTime.Text = timerKeeper.PrintTime();
             if (!timerKeeper.IsStarted)
             {
+                OnTimerEnded();
                 TaskbarManager.Instance.SetProgressValue(1, 1);
                 TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
                 timTimer.Stop();
@@ -162,11 +163,11 @@ namespace KeenTimeKeeper.Controls
                 lblCurrentTime.Text = lstTimes.SelectedItem?.ToString();
             timTimer.Enabled = timerKeeper.IsStarted = !timerKeeper.IsStarted;
             btnStartCancel.Text = timerKeeper.IsStarted ? "Cancel" : "Start";
-            StartTimerClicked?.Invoke(this, EventArgs.Empty);
+            //StartTimerClicked?.Invoke(this, EventArgs.Empty);
+            if (timerKeeper.IsStarted)
+                OnStartTimerClicked();
             TimerBeep();
         }
-
-        public event EventHandler? StartTimerClicked;
 
         private void StartTimerFromTheList()
         {

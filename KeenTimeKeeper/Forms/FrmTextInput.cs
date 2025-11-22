@@ -1,4 +1,5 @@
 ﻿using KeenTimeKeeper.Classes;
+using System.Data;
 
 namespace KeenTimeKeeper.Forms
 {
@@ -18,46 +19,63 @@ namespace KeenTimeKeeper.Forms
 
         /// <summary>Is ComboBox visible</summary>
         private bool isListMode = false;
+        public void SetToListMode()
+        {
+            isListMode = true;
+            var bs = new BindingSource
+            {
+                DataSource = Tasks,
+                Sort = "LastUsed DESC"
+            };
+            cmbList.DisplayMember = "Name";
+            cmbList.DataSource = bs;
+            cmbList.SelectedIndex = 0;
+            cmbList.Show();
+            timDelayDisplay.Start();
+            btnListRemove.Show();
+            txt.Hide();
+        }
 
         public string InputText
         {
             get => isListMode ? cmbList.Text : txt.Text;
         }
 
-        private List<TaskItem>? taskItems;
+        public Ds.TasksDataTable Tasks { get; set; }
 
-        public List<TaskItem>? TaskItems
-        {
-            get => taskItems;
-            internal set
-            {
-                taskItems = value;
-                cmbList.Items.Clear();
-                if (taskItems != null)
-                {
-                    foreach (var item in taskItems)
-                        cmbList.Items.Add(item);
-                }
-                cmbList.DisplayMember = "Name";
-                cmbList.SelectedIndex = 0;
-                cmbList.Show();
-                //cmbList.DroppedDown = true;
-                timDelayDisplay.Start();
-                btnListRemove.Show();
-                txt.Hide();
-                isListMode = true;
-            }
-        }
+        //private List<TaskItem>? taskItems;
 
-        public int? SelectedTaskTimeInSecs
-            => cmbList.SelectedItem is TaskItem it ? it.TimeInSecs : null;
+        //public List<TaskItem>? TaskItems
+        //{
+        //    get => taskItems;
+        //    internal set
+        //    {
+        //        taskItems = value;
+        //        cmbList.Items.Clear();
+        //        if (taskItems != null)
+        //        {
+        //            foreach (var item in taskItems)
+        //                cmbList.Items.Add(item);
+        //        }
+        //        cmbList.DisplayMember = "Name";
+        //        cmbList.SelectedIndex = 0;
+        //        cmbList.Show();
+        //        //cmbList.DroppedDown = true;
+        //        timDelayDisplay.Start();
+        //        btnListRemove.Show();
+        //        txt.Hide();
+        //        isListMode = true;
+        //    }
+        //}
+
+        //public int? SelectedTaskTimeInSecs
+        //    //=> cmbList.SelectedItem is TaskItem it ? it.TimeInSecs : null;
+        //    => GetTasksRow()?.TimeInSecs;
 
         private void CmbList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cmbList.SelectedItem is TaskItem it)
-                lblValue.Text = Utils.SecsToMS(it.TimeInSecs);
-            else
-                lblValue.Text = "";
+            var t = GetTasksRow();
+            lblValue.Text = (t != null) ? Utils.SecsToMS(t.TimeInSecs) : "";
         }
 
         // Clear label when text is updated manually (not selected from list)
@@ -66,16 +84,23 @@ namespace KeenTimeKeeper.Forms
             lblValue.Text = "";
         }
 
+        public Ds.TasksRow? GetTasksRow()
+        {
+            if ((cmbList.SelectedItem as DataRowView)?.Row is Ds.TasksRow t && t.Name == cmbList.Text)
+                return t;
+            else
+                return null;
+        }
+
         private void BtnListRemove_Click(object sender, EventArgs e)
         {
             try
             {
-                if (cmbList.SelectedItem is TaskItem it &&
-                    MessageBox.Show("Are you sure you want to remove the selected item?", "Confirm Removal"
-                    , MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                var t = GetTasksRow();
+                if (t != null && MessageBox.Show("Are you sure you want to remove the selected item?"
+                    , "Confirm Removal", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    taskItems?.Remove(it);
-                    cmbList.Items.Remove(it);
+                    Tasks.Rows.Remove(t);
                     lblValue.Text = "";
                     cmbList.DroppedDown = true;
                 }

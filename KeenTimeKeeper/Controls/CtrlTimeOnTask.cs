@@ -37,10 +37,15 @@ namespace KeenTimeKeeper.Controls
             var frm = new FrmTextInput(ctrl.Text, caption);
             if (ctrl == lblTaskName)
             {
-                var ti = taskItems.Find(it => it.Name == lblTaskName.Text);
-                if (ti != null)
-                    ti.TimeInSecs = timeInSecs;
-                frm.TaskItems = taskItems = taskItems.OrderByDescending(it => it.LastUsed).ToList();
+                //var ti = taskItems.Find(it => it.Name == lblTaskName.Text);
+                //if (ti != null)
+                //    ti.TimeInSecs = timeInSecs;
+                //frm.TaskItems = taskItems = taskItems.OrderByDescending(it => it.LastUsed).ToList();
+                var task = tasks.FirstOrDefault(it => it.Name == lblTaskName.Text);
+                if (task != null)
+                    task.TimeInSecs = timeInSecs;
+                frm.Tasks = tasks;
+                frm.SetToListMode();
             }
             if (frm.ShowDialog() == DialogResult.OK)
             {
@@ -53,15 +58,19 @@ namespace KeenTimeKeeper.Controls
                     else
                         ctrl.Text = val.ToString();
                 }
-                //else
-                //    ctrl.Text = frm.InputText;
-                if (ctrl == lblTaskName && prevText != frm.InputText)
+
+                var strFrmInput = frm.InputText;
+                //var tempTimeInSecs = frm.GetTasksRow()?.TimeInSecs ?? 0;
+                if (ctrl == lblTaskName && prevText != strFrmInput)
                 {
-                    var t = taskItems.Find(it => it.Name == frm.InputText);
-                    if (t != null)
-                        t.LastUsed = DateTime.Now;
-                    ctrl.Text = frm.InputText;
-                    timeInSecs = frm.SelectedTaskTimeInSecs ?? 0;
+                    var task = tasks.FirstOrDefault(it => it.Name == strFrmInput);
+                    if (task != null)
+                        task.LastUsed = DateTime.Now;
+
+                    ctrl.Text = strFrmInput;
+                    //timeInSecs = tempTimeInSecs;
+                    timeInSecs = task != null ? task.TimeInSecs : 0;
+                    numTimeChunk.Value = task != null ? task.ChunkMinutes : 10;
                     DisplayTime();
                 }
             }
@@ -138,7 +147,8 @@ namespace KeenTimeKeeper.Controls
             tim.Enabled = isRunning;
             DisplayTime();
             if (isRunning)
-                FrmMain!.WindowState = FormWindowState.Minimized;
+                //FrmMain!.WindowState = FormWindowState.Minimized;
+                OnStartTimerClicked();
         }
 
         private bool cancelBtnStartClick = false;
@@ -157,8 +167,9 @@ namespace KeenTimeKeeper.Controls
                 if (minutes > 0 && minutes % TimeChunkMinutes == 0 && timeInSecs % 60 == 0)
                 {
                     System.Media.SystemSounds.Exclamation.Play();
-                    FrmMain!.WindowState = FormWindowState.Minimized;
-                    FrmMain!.WindowState = FormWindowState.Normal;
+                    OnTimerEnded();
+                    //FrmMain!.WindowState = FormWindowState.Minimized;
+                    //FrmMain!.WindowState = FormWindowState.Normal;
                     btnStart.PerformClick();
                 }
             }
@@ -196,42 +207,53 @@ namespace KeenTimeKeeper.Controls
 
         public override void LoadSettings(Ds ds)
         {
+            tasks = ds.Tasks;
             timeInSecs = ds.Settings.ReadInt(nameof(timeInSecs), 0);
             lblTaskName.Text = ds.Settings.ReadString(nameof(lblTaskName), lblTaskName.Text)!;
             numTimeChunk.Value = ds.Settings.ReadInt(nameof(numTimeChunk), (int)numTimeChunk.Value);
-            var tasks = ds.Settings.ReadGroup(nameof(lblTaskName));
-            foreach (var s in tasks)
-            {
-                var ti = new TaskItem { Name = s.Name };
-                ti.FromValueString(s.Value);
-                taskItems.Add(ti);
-            }
-            var t = taskItems.Find(it => it.Name == lblTaskName.Text);
-            if (t != null)
-                timeInSecs = t.TimeInSecs;
+            //var tasks = ds.Settings.ReadGroup(nameof(lblTaskName));
+            //foreach (var s in tasks)
+            //{
+            //    var ti = new TaskItem { Name = s.Name };
+            //    ti.FromValueString(s.Value);
+            //    taskItems.Add(ti);
+            //}
+            //var t = taskItems.Find(it => it.Name == lblTaskName.Text);
+            //if (t != null)
+            //    timeInSecs = t.TimeInSecs;
+            var task = ds.Tasks.FirstOrDefault(it => it.Name == lblTaskName.Text);
+            if (task != null)
+                timeInSecs = task.TimeInSecs;
             DisplayTime();
         }
 
-        private List<TaskItem> taskItems = [];
+        //private List<TaskItem> taskItems = [];
+        private Ds.TasksDataTable tasks;
 
         public override void SaveSettings(Ds ds)
         {
-            var t = taskItems.Find(it => it.Name == lblTaskName.Text);
-            if (t != null)
-                t.TimeInSecs = timeInSecs;
+            // Save current task item
+            var task = tasks.FirstOrDefault(it => it.Name == lblTaskName.Text);
+            if (task != null)
+                task.TimeInSecs = timeInSecs;
             else
-                taskItems.Add(new TaskItem { Name = lblTaskName.Text, TimeInSecs = timeInSecs, LastUsed = DateTime.Now });
-            //foreach (var ti in taskItems)
-            //    ds.Settings.SaveSetting(nameof(lblTaskName), ti.Name, ti.TimeInSecs.ToString());
-            ds.Settings.SaveGroup(nameof(lblTaskName), taskItems
-                .Select(ti =>
-                {
-                    var s = ds.Settings.NewSettingsRow();
-                    s.Name = ti.Name;
-                    //s.Value = ti.TimeInSecs.ToString();
-                    s.Value = ti.ToValueString();
-                    return s;
-                }).ToList());
+                tasks.AddTasksRow(lblTaskName.Text, timeInSecs, TimeChunkMinutes, DateTime.Now);
+
+            //var t = taskItems.Find(it => it.Name == lblTaskName.Text);
+            //if (t != null)
+            //    t.TimeInSecs = timeInSecs;
+            //else
+            //    taskItems.Add(new TaskItem { Name = lblTaskName.Text, TimeInSecs = timeInSecs, LastUsed = DateTime.Now });
+
+            //ds.Settings.SaveGroup(nameof(lblTaskName), taskItems
+            //    .Select(ti =>
+            //    {
+            //        var s = ds.Settings.NewSettingsRow();
+            //        s.Name = ti.Name;
+            //        //s.Value = ti.TimeInSecs.ToString();
+            //        s.Value = ti.ToValueString();
+            //        return s;
+            //    }).ToList());
             ds.Settings.SaveSetting(nameof(lblTaskName), lblTaskName.Text);
             ds.Settings.SaveSetting(nameof(numTimeChunk), numTimeChunk.Value.ToString());
         }

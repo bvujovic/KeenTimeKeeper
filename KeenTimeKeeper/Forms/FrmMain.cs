@@ -9,6 +9,7 @@ namespace KeenTimeKeeper
         public FrmMain()
         {
             InitializeComponent();
+            ctrlModes = [ctrlTimer, ctrlTimeOnTask, ctrlCurrentTime];
         }
 
         private void FrmMain_Load(object sender, EventArgs e)
@@ -39,6 +40,7 @@ namespace KeenTimeKeeper
                 var strMode = ds.Settings.ReadString("strMode", string.Empty);
                 if (strMode != null)
                 {
+                    // maybe some list/dict that would connect ctrlModes with ToolStripMenuItems would be better
                     if (strMode.EndsWith(nameof(CtrlTimer)))
                         tsmiModesTimer.PerformClick();
                     else if (strMode.EndsWith(nameof(CtrlTimeOnTask)))
@@ -46,37 +48,57 @@ namespace KeenTimeKeeper
                     else if (strMode.EndsWith(nameof(CtrlCurrentTime)))
                         tsmiCurrentTime.PerformClick();
                 }
-                ctrlTimer.LoadSettings(ds);
-                ctrlTimeOnTask.LoadSettings(ds);
-                //initTlpTopHeight = tlpTop.Height;
-                ctrlTimer.StartTimerClicked += (s, ev) =>
+                foreach (var ctrl in ctrlModes)
                 {
-                    Debug.WriteLine("FrmMain: Timer started from CtrlTimer");
-                    var minOnStart = ds.Settings.ReadString(nameof(MinimizeOnStartTime)
-                        , Enum.GetName(MinimizeOnStartTime.Never));
-                    if (minOnStart != null && Enum.TryParse<MinimizeOnStartTime>(minOnStart, out var mode))
-                    {
-                        switch (mode)
-                        {
-                            case MinimizeOnStartTime.Immediately:
-                                this.WindowState = FormWindowState.Minimized;
-                                break;
-                            case MinimizeOnStartTime.After1Sec:
-                                timMinOnStartTimer.Interval = 1000;
-                                timMinOnStartTimer.Start();
-                                break;
-                                //case MinimizeOnStartTime.After2Secs:
-                                //    Utils.DelayAction(2000, (state) => this.WindowState = state);
-                                //    break;
-                                //case MinimizeOnStartTime.After5Secs:
-                                //    Utils.DelayAction(5000, (state) => this.WindowState = state);
-                                //    break;
-                        }
-                    }
-                };
+                    ctrl.LoadSettings(ds);
+                    ctrl.StartTimerClicked += CtrlMode_StartTimerClicked;
+                    ctrl.TimerEnded += CtrlMode_TimerEnded;
+                }
+                //ctrlTimer.LoadSettings(ds);
+                //ctrlTimeOnTask.LoadSettings(ds);
+                //ctrlTimeOnTask.StartTimerClicked += CtrlMode_StartTimerClicked;
+                //ctrlTimeOnTask.TimerEnded += CtrlMode_TimerEnded;
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             IsLoadFinished = true;
+        }
+
+        private void CtrlMode_StartTimerClicked(object? sender, EventArgs e)
+        {
+            if (GetMinOnStartTime() != MinimizeOnStartTime.Never)
+            {
+                var itv = GetMinOnStartTime() switch
+                {
+                    MinimizeOnStartTime.Immediately => 1,
+                    MinimizeOnStartTime.After1Sec => 1000,
+                    MinimizeOnStartTime.After2Secs => 2000,
+                    MinimizeOnStartTime.After5Secs => 5000,
+                    _ => 0
+                };
+                if (itv > 0)
+                {
+                    timMinOnStartTimer.Interval = itv;
+                    timMinOnStartTimer.Start();
+                }
+            }
+        }
+
+        private void CtrlMode_TimerEnded(object? sender, EventArgs e)
+        {
+            if (GetMinOnStartTime() != MinimizeOnStartTime.Never)
+            {
+                this.WindowState = FormWindowState.Minimized;
+                this.WindowState = FormWindowState.Normal;
+                this.Activate();
+            }
+        }
+
+        private MinimizeOnStartTime GetMinOnStartTime()
+        {
+            foreach (ToolStripMenuItem item in tsmiMminimizeOnStartTimer.DropDownItems)
+                if (item.Checked && Enum.TryParse<MinimizeOnStartTime>(item.Text, out var mode))
+                    return mode;
+            return MinimizeOnStartTime.Never;
         }
 
         private void TsmiMinimizeOnStartTimer_Click(object? sender, EventArgs e)
@@ -96,6 +118,7 @@ namespace KeenTimeKeeper
         private readonly CtrlTimer ctrlTimer = new();
         private readonly CtrlTimeOnTask ctrlTimeOnTask = new();
         private readonly CtrlCurrentTime ctrlCurrentTime = new();
+        private readonly CtrlMode[] ctrlModes;
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -106,8 +129,10 @@ namespace KeenTimeKeeper
                 var ctrl = GetCurrentCtrl();
                 var strMode = ctrl != null ? ctrl.GetType().ToString() : string.Empty;
                 ds.Settings.SaveSetting(nameof(strMode), strMode);
-                ctrlTimer.SaveSettings(ds);
-                ctrlTimeOnTask.SaveSettings(ds);
+                //ctrlTimer.SaveSettings(ds);
+                //ctrlTimeOnTask.SaveSettings(ds);
+                foreach (var c in ctrlModes)
+                    c.SaveSettings(ds);
 
                 if (WindowState == FormWindowState.Normal)
                 {

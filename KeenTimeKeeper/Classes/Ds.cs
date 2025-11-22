@@ -4,6 +4,12 @@ namespace KeenTimeKeeper.Classes
 {
     partial class Ds
     {
+        public partial class TasksRow
+        {
+            public override string ToString()
+                => $"{Name}, seconds: {TimeInSecs}, last used: {LastUsed}";
+        }
+
         public partial class SettingsRow
         {
             public override string ToString()
