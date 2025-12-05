@@ -7,10 +7,11 @@
 ![TimeOnTask](ScreenShots/TimeOnTask.png)
 
 ## TODO
-- [x] StartTimerClicked for (some) mode controls:
-	- [x] Make it work for CtrlTimerOnTask and CtrlTimer.
-	- [x] Make it work for all options: Immediate, 1/2/5secs, Never.
-	- [x] If the value is other then Never, restore FrmMain window after timer is stopped.
-- [x] Maybe chunk time should be saved in settings for each task separately.
-- [ ] Code cleanup. Remove class TaskItem.
+- [ ] Add/Modify task on OK in FrmTextInput
+- [x] Change "Go to" to "Copy location" for settings file 
+- [x] When CtrlCurrentTime is activated, auto turn on AlwaysOnTop (TopMost)
 - [ ] CtrlTimerOnTask should have an option for automatic click on Start/Resume button.
+- [x] Last position of the window should be measured and saved regarding closest edge (top/bottom, left/right)
+    so that the FrmMain is anchored and visible on different monitors.
+- [-] test 1
+- [/] test 2

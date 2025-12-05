@@ -41,36 +41,7 @@ namespace KeenTimeKeeper.Forms
             get => isListMode ? cmbList.Text : txt.Text;
         }
 
-        public Ds.TasksDataTable Tasks { get; set; }
-
-        //private List<TaskItem>? taskItems;
-
-        //public List<TaskItem>? TaskItems
-        //{
-        //    get => taskItems;
-        //    internal set
-        //    {
-        //        taskItems = value;
-        //        cmbList.Items.Clear();
-        //        if (taskItems != null)
-        //        {
-        //            foreach (var item in taskItems)
-        //                cmbList.Items.Add(item);
-        //        }
-        //        cmbList.DisplayMember = "Name";
-        //        cmbList.SelectedIndex = 0;
-        //        cmbList.Show();
-        //        //cmbList.DroppedDown = true;
-        //        timDelayDisplay.Start();
-        //        btnListRemove.Show();
-        //        txt.Hide();
-        //        isListMode = true;
-        //    }
-        //}
-
-        //public int? SelectedTaskTimeInSecs
-        //    //=> cmbList.SelectedItem is TaskItem it ? it.TimeInSecs : null;
-        //    => GetTasksRow()?.TimeInSecs;
+        public Ds.TasksDataTable? Tasks { get; set; }
 
         private void CmbList_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -97,7 +68,7 @@ namespace KeenTimeKeeper.Forms
             try
             {
                 var t = GetTasksRow();
-                if (t != null && MessageBox.Show("Are you sure you want to remove the selected item?"
+                if (t != null && Tasks != null && MessageBox.Show("Are you sure you want to remove the selected item?"
                     , "Confirm Removal", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     Tasks.Rows.Remove(t);

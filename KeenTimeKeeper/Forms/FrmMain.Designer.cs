@@ -39,6 +39,7 @@
             ctxMain = new ContextMenuStrip(components);
             tsmiModes = new ToolStripMenuItem();
             tsmiOptions = new ToolStripMenuItem();
+            tsmiCopyLocationOfSettingsFile = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
             timMinOnStartTimer = new System.Windows.Forms.Timer(components);
             ctxMain.SuspendLayout();
@@ -78,35 +79,42 @@
             // 
             tsmiAlwaysOnTop.CheckOnClick = true;
             tsmiAlwaysOnTop.Name = "tsmiAlwaysOnTop";
-            tsmiAlwaysOnTop.Size = new Size(200, 22);
+            tsmiAlwaysOnTop.Size = new Size(226, 22);
             tsmiAlwaysOnTop.Text = "Always on Top";
             tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
             // 
             // tsmiMminimizeOnStartTimer
             // 
             tsmiMminimizeOnStartTimer.Name = "tsmiMminimizeOnStartTimer";
-            tsmiMminimizeOnStartTimer.Size = new Size(200, 22);
+            tsmiMminimizeOnStartTimer.Size = new Size(226, 22);
             tsmiMminimizeOnStartTimer.Text = "Minimize on Start Timer";
             // 
             // ctxMain
             // 
             ctxMain.Items.AddRange(new ToolStripItem[] { tsmiModes, tsmiOptions });
             ctxMain.Name = "ctxMain";
-            ctxMain.Size = new Size(117, 48);
+            ctxMain.Size = new Size(181, 70);
             // 
             // tsmiModes
             // 
             tsmiModes.DropDownItems.AddRange(new ToolStripItem[] { tsmiModesTimer, tsmiModesTimeOnTask, tsmiCurrentTime });
             tsmiModes.Name = "tsmiModes";
-            tsmiModes.Size = new Size(116, 22);
+            tsmiModes.Size = new Size(180, 22);
             tsmiModes.Text = "Modes";
             // 
             // tsmiOptions
             // 
-            tsmiOptions.DropDownItems.AddRange(new ToolStripItem[] { tsmiAlwaysOnTop, tsmiMminimizeOnStartTimer });
+            tsmiOptions.DropDownItems.AddRange(new ToolStripItem[] { tsmiAlwaysOnTop, tsmiMminimizeOnStartTimer, tsmiCopyLocationOfSettingsFile });
             tsmiOptions.Name = "tsmiOptions";
-            tsmiOptions.Size = new Size(116, 22);
+            tsmiOptions.Size = new Size(180, 22);
             tsmiOptions.Text = "Options";
+            // 
+            // tsmiCopyLocationOfSettingsFile
+            // 
+            tsmiCopyLocationOfSettingsFile.Name = "tsmiCopyLocationOfSettingsFile";
+            tsmiCopyLocationOfSettingsFile.Size = new Size(226, 22);
+            tsmiCopyLocationOfSettingsFile.Text = "Copy location of Settings file";
+            tsmiCopyLocationOfSettingsFile.Click += TsmiCopyLocationOfSettingsFile_Click;
             // 
             // toolStripMenuItem1
             // 
@@ -155,5 +163,6 @@
         private ToolStripMenuItem toolStripMenuItem1;
         private ToolStripMenuItem tsmiOptions;
         private System.Windows.Forms.Timer timMinOnStartTimer;
+        private ToolStripMenuItem tsmiCopyLocationOfSettingsFile;
     }
 }

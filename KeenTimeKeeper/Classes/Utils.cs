@@ -17,7 +17,10 @@
             if (idxFolder == -1)
                 throw new Exception("KeenTimeKeeper folder on OneDrive/x is not found.");
         }
-        
+
+        //public static string? GetOneDriveAppFolder
+        //    => idxFolder != -1 ? folders[idxFolder] : null;
+
         private const string dataSetFileName = "dsSettings.xml";
 
         public static string GetDataSetFileName()

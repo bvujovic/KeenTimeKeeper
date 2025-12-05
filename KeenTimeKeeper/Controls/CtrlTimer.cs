@@ -163,7 +163,6 @@ namespace KeenTimeKeeper.Controls
                 lblCurrentTime.Text = lstTimes.SelectedItem?.ToString();
             timTimer.Enabled = timerKeeper.IsStarted = !timerKeeper.IsStarted;
             btnStartCancel.Text = timerKeeper.IsStarted ? "Cancel" : "Start";
-            //StartTimerClicked?.Invoke(this, EventArgs.Empty);
             if (timerKeeper.IsStarted)
                 OnStartTimerClicked();
             TimerBeep();

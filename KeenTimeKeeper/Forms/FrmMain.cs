@@ -17,9 +17,20 @@ namespace KeenTimeKeeper
             try
             {
                 ds.ReadXml(Utils.GetDataSetFileName());
-                var screen = Screen.PrimaryScreen!.WorkingArea;
-                Left = ds.Settings.ReadInt(nameof(Left), Left, it => it >= 0 && it < screen.Width);
-                Top = ds.Settings.ReadInt(nameof(Top), Top, it => it >= 0 && it <= screen.Height);
+                // Set position of the form 
+                var a = Screen.GetWorkingArea(this);
+                var xaxis = ds.Settings.ReadString("XAxis", nameof(Left));
+                var left = ds.Settings.ReadInt(nameof(Left), Left, it => it >= 0 && it < a.Width);
+                if (xaxis == nameof(Left))
+                    Left = left;
+                if (xaxis == nameof(Right))
+                    Left = a.Width - left - Width;
+                var yaxis = ds.Settings.ReadString("YAxis", nameof(Top));
+                var top = ds.Settings.ReadInt(nameof(Top), Top, it => it >= 0 && it <= a.Height);
+                if (yaxis == nameof(Top))
+                    Top = top;
+                if (yaxis == nameof(Bottom))
+                    Top = a.Height - top - Height;
                 tsmiModesTimer.Tag = ctrlTimer;
                 tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
                 tsmiCurrentTime.Tag = ctrlCurrentTime;
@@ -54,10 +65,6 @@ namespace KeenTimeKeeper
                     ctrl.StartTimerClicked += CtrlMode_StartTimerClicked;
                     ctrl.TimerEnded += CtrlMode_TimerEnded;
                 }
-                //ctrlTimer.LoadSettings(ds);
-                //ctrlTimeOnTask.LoadSettings(ds);
-                //ctrlTimeOnTask.StartTimerClicked += CtrlMode_StartTimerClicked;
-                //ctrlTimeOnTask.TimerEnded += CtrlMode_TimerEnded;
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             IsLoadFinished = true;
@@ -67,12 +74,13 @@ namespace KeenTimeKeeper
         {
             if (GetMinOnStartTime() != MinimizeOnStartTime.Never)
             {
+                const int itvLilWait = 250;
                 var itv = GetMinOnStartTime() switch
                 {
                     MinimizeOnStartTime.Immediately => 1,
-                    MinimizeOnStartTime.After1Sec => 1000,
-                    MinimizeOnStartTime.After2Secs => 2000,
-                    MinimizeOnStartTime.After5Secs => 5000,
+                    MinimizeOnStartTime.After1Sec => 1000 + itvLilWait,
+                    MinimizeOnStartTime.After2Secs => 2000 + itvLilWait,
+                    MinimizeOnStartTime.After5Secs => 5000 + itvLilWait,
                     _ => 0
                 };
                 if (itv > 0)
@@ -129,15 +137,34 @@ namespace KeenTimeKeeper
                 var ctrl = GetCurrentCtrl();
                 var strMode = ctrl != null ? ctrl.GetType().ToString() : string.Empty;
                 ds.Settings.SaveSetting(nameof(strMode), strMode);
-                //ctrlTimer.SaveSettings(ds);
-                //ctrlTimeOnTask.SaveSettings(ds);
                 foreach (var c in ctrlModes)
                     c.SaveSettings(ds);
-
+                // Save position of the form - save distances from closer edges of the screen
                 if (WindowState == FormWindowState.Normal)
                 {
-                    ds.Settings.SaveSetting(nameof(Left), Left.ToString());
-                    ds.Settings.SaveSetting(nameof(Top), Top.ToString());
+                    var a = Screen.GetWorkingArea(this);
+                    var right = a.X + a.Width - Right;
+                    if (Left < right)
+                    {
+                        ds.Settings.SaveSetting(nameof(Left), Left.ToString());
+                        ds.Settings.SaveSetting("XAxis", nameof(Left));
+                    }
+                    else
+                    {
+                        ds.Settings.SaveSetting(nameof(Left), right.ToString());
+                        ds.Settings.SaveSetting("XAxis", nameof(Right));
+                    }
+                    var bottom = a.Y + a.Height - Bottom;
+                    if(Top < bottom)
+                    {
+                        ds.Settings.SaveSetting("YAxis", nameof(Top));
+                        ds.Settings.SaveSetting(nameof(Top), Top.ToString());
+                    }
+                    else
+                    { 
+                        ds.Settings.SaveSetting("YAxis", nameof(Bottom));
+                        ds.Settings.SaveSetting(nameof(Top), bottom.ToString());
+                    }
                 }
                 ds.WriteXml(Utils.GetDataSetFileName());
             }
@@ -169,17 +196,35 @@ namespace KeenTimeKeeper
                 var dh = initCtrlSize.Height - ctrl.Height;
                 this.Size = new Size(this.Width + dw, this.Height + dh);
             }
+            if (ctrl is CtrlCurrentTime && !TopMost)
+                SetTopMost(true, true);
+            if (ctrl is not CtrlCurrentTime && TopMost && turnOffTopMost)
+                SetTopMost(false, true);
         }
 
-        private void FrmMain_KeyUp(object sender, KeyEventArgs e)
-            => GetCurrentCtrl()?.CtrlKeyUp(e);
+        /// <summary>...</summary>
+        private bool turnOffTopMost = false;
 
-        private CtrlMode? GetCurrentCtrl()
-            => this.pnlMain.Controls.Count > 0 ? this.pnlMain.Controls[0] as CtrlMode : null;
-
-        private void TsmiAlwaysOnTop_CheckedChanged(object sender, EventArgs e)
+        /// <summary>
+        /// ...
+        /// </summary>
+        /// <param name="isTopMost"></param>
+        /// <param name="isAuto"></param>
+        private void SetTopMost(bool isTopMost, bool isAuto)
         {
-            this.TopMost = tsmiAlwaysOnTop.Checked;
+            tsmiAlwaysOnTop.CheckedChanged -= TsmiAlwaysOnTop_CheckedChanged;
+            turnOffTopMost = isTopMost && isAuto;
+            TopMost = isTopMost;
+            //if (isAuto)
+            //    tsmiAlwaysOnTop.Checked = isTopMost;
+            tsmiAlwaysOnTop.Checked = isTopMost;
+            tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
+        }
+
+        private void TsmiAlwaysOnTop_CheckedChanged(object? sender, EventArgs e)
+        {
+            //this.TopMost = tsmiAlwaysOnTop.Checked;
+            SetTopMost(tsmiAlwaysOnTop.Checked, false);
         }
 
         private void TimMinOnStartTimer_Tick(object sender, EventArgs e)
@@ -187,5 +232,25 @@ namespace KeenTimeKeeper
             this.WindowState = FormWindowState.Minimized;
             timMinOnStartTimer.Stop();
         }
+
+        private void TsmiCopyLocationOfSettingsFile_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(Utils.GetDataSetFileName() ?? "");
+            //try
+            //{                
+            //    Process.Start(new ProcessStartInfo()
+            //    {
+            //        UseShellExecute = true,
+            //        FileName = Utils.GetOneDriveAppFolder
+            //    });
+            //}
+            //catch (Exception ex) { MessageBox.Show(ex.Message, "Open App Folder"); }
+        }
+
+        private void FrmMain_KeyUp(object sender, KeyEventArgs e)
+            => GetCurrentCtrl()?.CtrlKeyUp(e);
+
+        private CtrlMode? GetCurrentCtrl()
+            => this.pnlMain.Controls.Count > 0 ? this.pnlMain.Controls[0] as CtrlMode : null;
     }
 }
