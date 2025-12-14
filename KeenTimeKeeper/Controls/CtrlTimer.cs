@@ -95,6 +95,8 @@ namespace KeenTimeKeeper.Controls
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
+            else if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
+                lstTimes.Focus();
         }
 
         private void LstTimes_KeyUp(object sender, KeyEventArgs e)

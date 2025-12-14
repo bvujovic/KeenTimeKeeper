@@ -17,20 +17,6 @@ namespace KeenTimeKeeper
             try
             {
                 ds.ReadXml(Utils.GetDataSetFileName());
-                // Set position of the form 
-                var a = Screen.GetWorkingArea(this);
-                var xaxis = ds.Settings.ReadString("XAxis", nameof(Left));
-                var left = ds.Settings.ReadInt(nameof(Left), Left, it => it >= 0 && it < a.Width);
-                if (xaxis == nameof(Left))
-                    Left = left;
-                if (xaxis == nameof(Right))
-                    Left = a.Width - left - Width;
-                var yaxis = ds.Settings.ReadString("YAxis", nameof(Top));
-                var top = ds.Settings.ReadInt(nameof(Top), Top, it => it >= 0 && it <= a.Height);
-                if (yaxis == nameof(Top))
-                    Top = top;
-                if (yaxis == nameof(Bottom))
-                    Top = a.Height - top - Height;
                 tsmiModesTimer.Tag = ctrlTimer;
                 tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
                 tsmiCurrentTime.Tag = ctrlCurrentTime;
@@ -65,6 +51,14 @@ namespace KeenTimeKeeper
                     ctrl.StartTimerClicked += CtrlMode_StartTimerClicked;
                     ctrl.TimerEnded += CtrlMode_TimerEnded;
                 }
+                // Set position of the form 
+                var a = Screen.GetWorkingArea(this);
+                var xaxis = ds.Settings.ReadString("XAxis", nameof(Left));
+                var left = ds.Settings.ReadInt(nameof(Left), Left, it => it >= 0 && it < a.Width);
+                Left = (xaxis == nameof(Left)) ? left : (a.Width - left - Width);
+                var yaxis = ds.Settings.ReadString("YAxis", nameof(Top));
+                var top = ds.Settings.ReadInt(nameof(Top), Top, it => it >= 0 && it <= a.Height);
+                Top = (yaxis == nameof(Top)) ? top : (a.Height - top - Height);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             IsLoadFinished = true;
@@ -144,27 +138,34 @@ namespace KeenTimeKeeper
                 {
                     var a = Screen.GetWorkingArea(this);
                     var right = a.X + a.Width - Right;
-                    if (Left < right)
-                    {
-                        ds.Settings.SaveSetting(nameof(Left), Left.ToString());
-                        ds.Settings.SaveSetting("XAxis", nameof(Left));
-                    }
-                    else
-                    {
-                        ds.Settings.SaveSetting(nameof(Left), right.ToString());
-                        ds.Settings.SaveSetting("XAxis", nameof(Right));
-                    }
+                    //if (Left < right)
+                    //{
+                    //    ds.Settings.SaveSetting(nameof(Left), Left.ToString());
+                    //    ds.Settings.SaveSetting("XAxis", nameof(Left));
+                    //}
+                    //else
+                    //{
+                    //    ds.Settings.SaveSetting(nameof(Left), right.ToString());
+                    //    ds.Settings.SaveSetting("XAxis", nameof(Right));
+                    //}
+                    //ds.Settings.SaveSetting(nameof(Left), Left < right ? Left.ToString() : right.ToString());
+                    //ds.Settings.SaveSetting(nameof(Left), (Left < right ? Left : right).ToString());
+                    ds.Settings.SaveSetting(nameof(Left), (Math.Min(Left, right)).ToString());
+                    ds.Settings.SaveSetting("XAxis", (Left < right ? nameof(Left) : nameof(Right)));
+
                     var bottom = a.Y + a.Height - Bottom;
-                    if(Top < bottom)
-                    {
-                        ds.Settings.SaveSetting("YAxis", nameof(Top));
-                        ds.Settings.SaveSetting(nameof(Top), Top.ToString());
-                    }
-                    else
-                    { 
-                        ds.Settings.SaveSetting("YAxis", nameof(Bottom));
-                        ds.Settings.SaveSetting(nameof(Top), bottom.ToString());
-                    }
+                    //if (Top < bottom)
+                    //{
+                    //    ds.Settings.SaveSetting(nameof(Top), Top.ToString());
+                    //    ds.Settings.SaveSetting("YAxis", nameof(Top));
+                    //}
+                    //else
+                    //{
+                    //    ds.Settings.SaveSetting(nameof(Top), bottom.ToString());
+                    //    ds.Settings.SaveSetting("YAxis", nameof(Bottom));
+                    //}
+                    ds.Settings.SaveSetting(nameof(Top), (Math.Min(Top, bottom)).ToString());
+                    ds.Settings.SaveSetting("YAxis", (Top < bottom ? nameof(Top) : nameof(Bottom)));
                 }
                 ds.WriteXml(Utils.GetDataSetFileName());
             }
@@ -236,15 +237,6 @@ namespace KeenTimeKeeper
         private void TsmiCopyLocationOfSettingsFile_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(Utils.GetDataSetFileName() ?? "");
-            //try
-            //{                
-            //    Process.Start(new ProcessStartInfo()
-            //    {
-            //        UseShellExecute = true,
-            //        FileName = Utils.GetOneDriveAppFolder
-            //    });
-            //}
-            //catch (Exception ex) { MessageBox.Show(ex.Message, "Open App Folder"); }
         }
 
         private void FrmMain_KeyUp(object sender, KeyEventArgs e)

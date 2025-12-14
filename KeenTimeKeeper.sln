@@ -13,7 +13,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ScreenShots", "ScreenShots", "{03E90CED-05A4-46EF-81F8-C78A8CE7F625}"
 	ProjectSection(SolutionItems) = preProject
 		ScreenShots\TimeOnTask.png = ScreenShots\TimeOnTask.png
+		ScreenShots\TimeOnTask_Modes.png = ScreenShots\TimeOnTask_Modes.png
 		ScreenShots\Timer.png = ScreenShots\Timer.png
+		ScreenShots\Timer_TaskbarIcon.png = ScreenShots\Timer_TaskbarIcon.png
 	EndProjectSection
 EndProject
 Global
