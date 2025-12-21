@@ -7,6 +7,7 @@
             "c:\\Users\\sosos\\OneDrive\\x\\AppData\\KeenTimeKeeper\\"
             ];
 
+        // Index of the found OneDrive/x folder in the folders array
         private static int idxFolder = -1;
 
         public static void SetOneDriveAppFolder()
