@@ -25,7 +25,7 @@ namespace KeenTimeKeeper
                     , Enum.GetName(MinimizeOnStartTime.Never));
                 foreach (MinimizeOnStartTime mode in Enum.GetValues(typeof(MinimizeOnStartTime)))
                 {
-                    var item = new ToolStripMenuItem(mode.ToString())
+                    var item = new ToolStripMenuItem(mode.ToDisplayString())
                     {
                         Checked = Enum.GetName(mode) == minOnStartTime,
                         CheckOnClick = true,
@@ -98,7 +98,7 @@ namespace KeenTimeKeeper
         private MinimizeOnStartTime GetMinOnStartTime()
         {
             foreach (ToolStripMenuItem item in tsmiMminimizeOnStartTimer.DropDownItems)
-                if (item.Checked && Enum.TryParse<MinimizeOnStartTime>(item.Text, out var mode))
+                if (item.Checked && item.Tag is MinimizeOnStartTime mode)
                     return mode;
             return MinimizeOnStartTime.Never;
         }

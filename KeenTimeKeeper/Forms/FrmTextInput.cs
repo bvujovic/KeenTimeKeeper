@@ -19,15 +19,20 @@ namespace KeenTimeKeeper.Forms
 
         /// <summary>Is ComboBox visible</summary>
         private bool isListMode = false;
+
         public void SetToListMode()
         {
+            if (Tasks == null)
+                return;
+            foreach (var t in Tasks)
+                t.NameTime = $"{t.Name} - ({Utils.SecsToMS(t.TimeInSecs)})";
             isListMode = true;
             var bs = new BindingSource
             {
                 DataSource = Tasks,
                 Sort = "LastUsed DESC"
             };
-            cmbList.DisplayMember = "Name";
+            cmbList.DisplayMember = "NameTime";
             cmbList.DataSource = bs;
             cmbList.SelectedIndex = 0;
             cmbList.Show();

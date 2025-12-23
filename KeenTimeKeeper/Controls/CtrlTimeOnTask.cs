@@ -61,6 +61,8 @@ namespace KeenTimeKeeper.Controls
                     var task = tasks.FirstOrDefault(it => it.Name == strFrmInput);
                     if (task != null)
                         task.LastUsed = DateTime.Now;
+                    else
+                        tasks.AddTasksRow(strFrmInput, 0, 10, DateTime.Now, "");
 
                     ctrl.Text = strFrmInput;
                     timeInSecs = task != null ? task.TimeInSecs : 0;
@@ -206,8 +208,8 @@ namespace KeenTimeKeeper.Controls
             var task = tasks.FirstOrDefault(it => it.Name == lblTaskName.Text);
             if (task != null)
                 task.TimeInSecs = timeInSecs;
-            else
-                tasks.AddTasksRow(lblTaskName.Text, timeInSecs, TimeChunkMinutes, DateTime.Now);
+            //else
+            //    tasks.AddTasksRow(lblTaskName.Text, timeInSecs, TimeChunkMinutes, DateTime.Now);
 
             ds.Settings.SaveSetting(nameof(lblTaskName), lblTaskName.Text);
             ds.Settings.SaveSetting(nameof(numTimeChunk), numTimeChunk.Value.ToString());
