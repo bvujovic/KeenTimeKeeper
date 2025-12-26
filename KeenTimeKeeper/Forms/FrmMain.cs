@@ -16,7 +16,7 @@ namespace KeenTimeKeeper
         {
             try
             {
-                ds.ReadXml(Utils.GetDataSetFileName());
+                ds.ReadXml(Data.GetDataSetFileName());
                 tsmiModesTimer.Tag = ctrlTimer;
                 tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
                 tsmiCurrentTime.Tag = ctrlCurrentTime;
@@ -116,6 +116,7 @@ namespace KeenTimeKeeper
         public bool IsLoadFinished { get; private set; } = false;
 
         private readonly Ds ds = new();
+        public Ds DataSet => ds;
 
         private readonly CtrlTimer ctrlTimer = new();
         private readonly CtrlTimeOnTask ctrlTimeOnTask = new();
@@ -130,6 +131,7 @@ namespace KeenTimeKeeper
             {
                 var ctrl = GetCurrentCtrl();
                 var strMode = ctrl != null ? ctrl.GetType().ToString() : string.Empty;
+                Data.UpdateDataSetFromFile(ds);
                 ds.Settings.SaveSetting(nameof(strMode), strMode);
                 foreach (var c in ctrlModes)
                     c.SaveSettings(ds);
@@ -138,46 +140,20 @@ namespace KeenTimeKeeper
                 {
                     var a = Screen.GetWorkingArea(this);
                     var right = a.X + a.Width - Right;
-                    //if (Left < right)
-                    //{
-                    //    ds.Settings.SaveSetting(nameof(Left), Left.ToString());
-                    //    ds.Settings.SaveSetting("XAxis", nameof(Left));
-                    //}
-                    //else
-                    //{
-                    //    ds.Settings.SaveSetting(nameof(Left), right.ToString());
-                    //    ds.Settings.SaveSetting("XAxis", nameof(Right));
-                    //}
-                    //ds.Settings.SaveSetting(nameof(Left), Left < right ? Left.ToString() : right.ToString());
-                    //ds.Settings.SaveSetting(nameof(Left), (Left < right ? Left : right).ToString());
                     ds.Settings.SaveSetting(nameof(Left), (Math.Min(Left, right)).ToString());
                     ds.Settings.SaveSetting("XAxis", (Left < right ? nameof(Left) : nameof(Right)));
 
                     var bottom = a.Y + a.Height - Bottom;
-                    //if (Top < bottom)
-                    //{
-                    //    ds.Settings.SaveSetting(nameof(Top), Top.ToString());
-                    //    ds.Settings.SaveSetting("YAxis", nameof(Top));
-                    //}
-                    //else
-                    //{
-                    //    ds.Settings.SaveSetting(nameof(Top), bottom.ToString());
-                    //    ds.Settings.SaveSetting("YAxis", nameof(Bottom));
-                    //}
                     ds.Settings.SaveSetting(nameof(Top), (Math.Min(Top, bottom)).ToString());
                     ds.Settings.SaveSetting("YAxis", (Top < bottom ? nameof(Top) : nameof(Bottom)));
                 }
-                ds.WriteXml(Utils.GetDataSetFileName());
+                ds.WriteXml(Data.GetDataSetFileName());
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         private void TsmiModes_Click(object sender, EventArgs e)
         {
-            // Save settings of the current control before switching to another one
-            //var currentCtrl = this.Controls.Count > 0 ? this.Controls[0] as CtrlMode : null;
-            //currentCtrl?.SaveSettings(ds);
-
             CtrlMode? ctrl = null;
             if (sender is ToolStripMenuItem tsmi)
                 foreach (ToolStripMenuItem item in tsmiModes.DropDownItems)
@@ -216,15 +192,12 @@ namespace KeenTimeKeeper
             tsmiAlwaysOnTop.CheckedChanged -= TsmiAlwaysOnTop_CheckedChanged;
             turnOffTopMost = isTopMost && isAuto;
             TopMost = isTopMost;
-            //if (isAuto)
-            //    tsmiAlwaysOnTop.Checked = isTopMost;
             tsmiAlwaysOnTop.Checked = isTopMost;
             tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
         }
 
         private void TsmiAlwaysOnTop_CheckedChanged(object? sender, EventArgs e)
         {
-            //this.TopMost = tsmiAlwaysOnTop.Checked;
             SetTopMost(tsmiAlwaysOnTop.Checked, false);
         }
 
@@ -234,9 +207,18 @@ namespace KeenTimeKeeper
             timMinOnStartTimer.Stop();
         }
 
-        private void TsmiCopyLocationOfSettingsFile_Click(object sender, EventArgs e)
+        private void TsmiCopyLocationOfDataFile_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(Utils.GetDataSetFileName() ?? "");
+            Clipboard.SetText(Data.GetDataSetFileName() ?? "");
+        }
+
+        private void TsmiUpdateDataFromFile_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Data.UpdateDataSetFromFile(ds);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         private void FrmMain_KeyUp(object sender, KeyEventArgs e)

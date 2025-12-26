@@ -43,7 +43,16 @@ namespace KeenTimeKeeper.Forms
 
         public string InputText
         {
-            get => isListMode ? cmbList.Text : txt.Text;
+            get
+            {
+                if (isListMode)
+                {
+                    var t = GetTasksRow();
+                    return (t != null) ? t.Name : cmbList.Text;
+                }
+                else
+                    return txt.Text;
+            }
         }
 
         public Ds.TasksDataTable? Tasks { get; set; }
@@ -51,18 +60,18 @@ namespace KeenTimeKeeper.Forms
         private void CmbList_SelectedIndexChanged(object sender, EventArgs e)
         {
             var t = GetTasksRow();
-            lblValue.Text = (t != null) ? Utils.SecsToMS(t.TimeInSecs) : "";
+            //lblValue.Text = (t != null) ? Utils.SecsToMS(t.TimeInSecs) : "";
         }
 
         // Clear label when text is updated manually (not selected from list)
         private void CmbList_TextUpdate(object sender, EventArgs e)
         {
-            lblValue.Text = "";
+            //lblValue.Text = "";
         }
 
         public Ds.TasksRow? GetTasksRow()
         {
-            if ((cmbList.SelectedItem as DataRowView)?.Row is Ds.TasksRow t && t.Name == cmbList.Text)
+            if ((cmbList.SelectedItem as DataRowView)?.Row is Ds.TasksRow t && t.NameTime == cmbList.Text)
                 return t;
             else
                 return null;
@@ -77,7 +86,7 @@ namespace KeenTimeKeeper.Forms
                     , "Confirm Removal", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     Tasks.Rows.Remove(t);
-                    lblValue.Text = "";
+                    //lblValue.Text = "";
                     cmbList.DroppedDown = true;
                 }
             }

@@ -20,57 +20,62 @@ namespace KeenTimeKeeper.Controls
         /// <summary>Changes the text of a control on right-click using a dialog.</summary>
         private void ChangeText(Control ctrl, MouseEventArgs e, bool isItInt = false)
         {
-            if (e.Button != MouseButtons.Right)
-                return;
+            try
+            {
+                if (e.Button != MouseButtons.Right)
+                    return;
 
-            string? caption = null;
-            if (isItInt)
-            {
-                if (ctrl == lblCurrentChunkMinutes)
-                    caption = $"Enter minutes (0-{TimeChunkMinutes - 1})";
-                else
-                    caption = "Enter a number";
-            }
-            if (ctrl == lblTaskName)
-                caption = "Select or add new Task";
-            var prevText = lblTaskName.Text;
-            var frm = new FrmTextInput(ctrl.Text, caption);
-            if (ctrl == lblTaskName)
-            {
-                var task = tasks.FirstOrDefault(it => it.Name == lblTaskName.Text);
-                if (task != null)
-                    task.TimeInSecs = timeInSecs;
-                frm.Tasks = tasks;
-                frm.SetToListMode();
-            }
-            if (frm.ShowDialog() == DialogResult.OK)
-            {
+                string? caption = null;
                 if (isItInt)
                 {
-                    if (!int.TryParse(frm.InputText, out int val))
-                        MessageBox.Show("Invalid number format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    else if (ctrl == lblCurrentChunkMinutes && (val < 0 || val >= TimeChunkMinutes))
-                        MessageBox.Show($"Value must be between 0 and {TimeChunkMinutes - 1}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (ctrl == lblCurrentChunkMinutes)
+                        caption = $"Enter minutes (0-{TimeChunkMinutes - 1})";
                     else
-                        ctrl.Text = val.ToString();
+                        caption = "Enter a number";
                 }
-
-                var strFrmInput = frm.InputText;
-                if (ctrl == lblTaskName && prevText != strFrmInput)
+                if (ctrl == lblTaskName)
                 {
-                    var task = tasks.FirstOrDefault(it => it.Name == strFrmInput);
-                    if (task != null)
-                        task.LastUsed = DateTime.Now;
-                    else
-                        tasks.AddTasksRow(strFrmInput, 0, 10, DateTime.Now, "");
-
-                    ctrl.Text = strFrmInput;
-                    timeInSecs = task != null ? task.TimeInSecs : 0;
-                    numTimeChunk.Value = task != null ? task.ChunkMinutes : 10;
-                    DisplayTime();
+                    caption = "Select or add new Task";
+                    Data.UpdateDataSetFromFile(FrmMain!.DataSet);
                 }
+                var prevText = (ctrl == lblTaskName) ? (CurrentTask != null ? CurrentTask.Name : Ds.TasksRow.DefaultTaskName)
+                    : lblTaskName.Text;
+                var frm = new FrmTextInput(ctrl.Text, caption);
+                if (ctrl == lblTaskName)
+                {
+                    var task = tasks.Find(prevText);
+                    if (task != null)
+                        task.TimeInSecs = timeInSecs;
+                    frm.Tasks = tasks;
+                    frm.SetToListMode();
+                }
+                if (frm.ShowDialog() == DialogResult.OK)
+                {
+                    if (isItInt)
+                    {
+                        if (!int.TryParse(frm.InputText, out int val))
+                            MessageBox.Show("Invalid number format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        else if (ctrl == lblCurrentChunkMinutes && (val < 0 || val >= TimeChunkMinutes))
+                            MessageBox.Show($"Value must be between 0 and {TimeChunkMinutes - 1}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        else
+                            ctrl.Text = val.ToString();
+                    }
+
+                    var strFrmInput = frm.InputText;
+                    if (ctrl == lblTaskName && prevText != strFrmInput)
+                    {
+                        var task = tasks.Find(strFrmInput);
+                        if (task != null)
+                            task.LastUsed = DateTime.Now;
+                        else
+                            tasks.AddTasksRow(strFrmInput, Ds.TasksRow.DefaultTaskTimeInSecs, Ds.TasksRow.DefaultChunkMinutes, DateTime.Now, "");
+                        CurrentTask = task;
+                        timeInSecs = CurrentTask != null ? CurrentTask.TimeInSecs : Ds.TasksRow.DefaultTaskTimeInSecs;
+                    }
+                }
+                lastChangeTextClose = DateTime.Now;
             }
-            lastChangeTextClose = DateTime.Now;
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         private DateTime lastChangeTextClose = DateTime.MinValue;
@@ -191,28 +196,40 @@ namespace KeenTimeKeeper.Controls
         public override void LoadSettings(Ds ds)
         {
             tasks = ds.Tasks;
-            timeInSecs = ds.Settings.ReadInt(nameof(timeInSecs), 0);
-            lblTaskName.Text = ds.Settings.ReadString(nameof(lblTaskName), lblTaskName.Text)!;
-            numTimeChunk.Value = ds.Settings.ReadInt(nameof(numTimeChunk), (int)numTimeChunk.Value);
-            var task = ds.Tasks.FirstOrDefault(it => it.Name == lblTaskName.Text);
-            if (task != null)
-                timeInSecs = task.TimeInSecs;
-            DisplayTime();
+            var taskName = ds.Settings.ReadString(nameof(CurrentTask), string.Empty)!;
+            //CurrentTask = FindTask(taskName);
+            CurrentTask = tasks.Find(taskName);
         }
+
+        //private Ds.TasksRow? FindTask(string taskName)
+        //    => tasks.FirstOrDefault(it => it.Name == taskName);
 
         private Ds.TasksDataTable tasks;
 
+        private Ds.TasksRow? currentTask;
+
+        public Ds.TasksRow? CurrentTask
+        {
+            get => currentTask;
+            set
+            {
+                currentTask = value;
+                lblTaskName.Text = (currentTask != null) ? currentTask.Name : Ds.TasksRow.DefaultTaskName;
+                timeInSecs = (currentTask != null) ? currentTask.TimeInSecs : Ds.TasksRow.DefaultTaskTimeInSecs;
+                numTimeChunk.Value = (currentTask != null) ? currentTask.ChunkMinutes : Ds.TasksRow.DefaultChunkMinutes;
+                DisplayTime();
+            }
+        }
+
         public override void SaveSettings(Ds ds)
         {
-            // Save current task item
-            var task = tasks.FirstOrDefault(it => it.Name == lblTaskName.Text);
-            if (task != null)
-                task.TimeInSecs = timeInSecs;
-            //else
-            //    tasks.AddTasksRow(lblTaskName.Text, timeInSecs, TimeChunkMinutes, DateTime.Now);
-
-            ds.Settings.SaveSetting(nameof(lblTaskName), lblTaskName.Text);
-            ds.Settings.SaveSetting(nameof(numTimeChunk), numTimeChunk.Value.ToString());
+            if (currentTask != null)
+            {
+                currentTask.TimeInSecs = timeInSecs;
+                currentTask.ChunkMinutes = TimeChunkMinutes;
+                currentTask.LastUsed = DateTime.Now;
+            }
+            ds.Settings.SaveSetting(nameof(CurrentTask), CurrentTask?.Name);
         }
 
         public override void CtrlKeyUp(KeyEventArgs e)

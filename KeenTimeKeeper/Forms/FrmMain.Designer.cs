@@ -39,7 +39,8 @@
             ctxMain = new ContextMenuStrip(components);
             tsmiModes = new ToolStripMenuItem();
             tsmiOptions = new ToolStripMenuItem();
-            tsmiCopyLocationOfSettingsFile = new ToolStripMenuItem();
+            tsmiCopyLocationOfDataFile = new ToolStripMenuItem();
+            tsmiUpdateDataFromFile = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
             timMinOnStartTimer = new System.Windows.Forms.Timer(components);
             ctxMain.SuspendLayout();
@@ -48,21 +49,21 @@
             // tsmiModesTimer
             // 
             tsmiModesTimer.Name = "tsmiModesTimer";
-            tsmiModesTimer.Size = new Size(143, 22);
+            tsmiModesTimer.Size = new Size(144, 22);
             tsmiModesTimer.Text = "Timer";
             tsmiModesTimer.Click += TsmiModes_Click;
             // 
             // tsmiModesTimeOnTask
             // 
             tsmiModesTimeOnTask.Name = "tsmiModesTimeOnTask";
-            tsmiModesTimeOnTask.Size = new Size(143, 22);
+            tsmiModesTimeOnTask.Size = new Size(144, 22);
             tsmiModesTimeOnTask.Text = "Time on Task";
             tsmiModesTimeOnTask.Click += TsmiModes_Click;
             // 
             // tsmiCurrentTime
             // 
             tsmiCurrentTime.Name = "tsmiCurrentTime";
-            tsmiCurrentTime.Size = new Size(143, 22);
+            tsmiCurrentTime.Size = new Size(144, 22);
             tsmiCurrentTime.Text = "Current Time";
             tsmiCurrentTime.Click += TsmiModes_Click;
             // 
@@ -79,42 +80,49 @@
             // 
             tsmiAlwaysOnTop.CheckOnClick = true;
             tsmiAlwaysOnTop.Name = "tsmiAlwaysOnTop";
-            tsmiAlwaysOnTop.Size = new Size(226, 22);
+            tsmiAlwaysOnTop.Size = new Size(213, 22);
             tsmiAlwaysOnTop.Text = "Always on Top";
             tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
             // 
             // tsmiMminimizeOnStartTimer
             // 
             tsmiMminimizeOnStartTimer.Name = "tsmiMminimizeOnStartTimer";
-            tsmiMminimizeOnStartTimer.Size = new Size(226, 22);
+            tsmiMminimizeOnStartTimer.Size = new Size(213, 22);
             tsmiMminimizeOnStartTimer.Text = "Minimize on Start Timer";
             // 
             // ctxMain
             // 
             ctxMain.Items.AddRange(new ToolStripItem[] { tsmiModes, tsmiOptions });
             ctxMain.Name = "ctxMain";
-            ctxMain.Size = new Size(181, 70);
+            ctxMain.Size = new Size(117, 48);
             // 
             // tsmiModes
             // 
             tsmiModes.DropDownItems.AddRange(new ToolStripItem[] { tsmiModesTimer, tsmiModesTimeOnTask, tsmiCurrentTime });
             tsmiModes.Name = "tsmiModes";
-            tsmiModes.Size = new Size(180, 22);
+            tsmiModes.Size = new Size(116, 22);
             tsmiModes.Text = "Modes";
             // 
             // tsmiOptions
             // 
-            tsmiOptions.DropDownItems.AddRange(new ToolStripItem[] { tsmiAlwaysOnTop, tsmiMminimizeOnStartTimer, tsmiCopyLocationOfSettingsFile });
+            tsmiOptions.DropDownItems.AddRange(new ToolStripItem[] { tsmiAlwaysOnTop, tsmiMminimizeOnStartTimer, tsmiCopyLocationOfDataFile, tsmiUpdateDataFromFile });
             tsmiOptions.Name = "tsmiOptions";
-            tsmiOptions.Size = new Size(180, 22);
+            tsmiOptions.Size = new Size(116, 22);
             tsmiOptions.Text = "Options";
             // 
-            // tsmiCopyLocationOfSettingsFile
+            // tsmiCopyLocationOfDataFile
             // 
-            tsmiCopyLocationOfSettingsFile.Name = "tsmiCopyLocationOfSettingsFile";
-            tsmiCopyLocationOfSettingsFile.Size = new Size(226, 22);
-            tsmiCopyLocationOfSettingsFile.Text = "Copy location of Settings file";
-            tsmiCopyLocationOfSettingsFile.Click += TsmiCopyLocationOfSettingsFile_Click;
+            tsmiCopyLocationOfDataFile.Name = "tsmiCopyLocationOfDataFile";
+            tsmiCopyLocationOfDataFile.Size = new Size(213, 22);
+            tsmiCopyLocationOfDataFile.Text = "Copy Location of Data File";
+            tsmiCopyLocationOfDataFile.Click += TsmiCopyLocationOfDataFile_Click;
+            // 
+            // tsmiUpdateDataFromFile
+            // 
+            tsmiUpdateDataFromFile.Name = "tsmiUpdateDataFromFile";
+            tsmiUpdateDataFromFile.Size = new Size(213, 22);
+            tsmiUpdateDataFromFile.Text = "Update Data from File";
+            tsmiUpdateDataFromFile.Click += TsmiUpdateDataFromFile_Click;
             // 
             // toolStripMenuItem1
             // 
@@ -163,6 +171,7 @@
         private ToolStripMenuItem toolStripMenuItem1;
         private ToolStripMenuItem tsmiOptions;
         private System.Windows.Forms.Timer timMinOnStartTimer;
-        private ToolStripMenuItem tsmiCopyLocationOfSettingsFile;
+        private ToolStripMenuItem tsmiCopyLocationOfDataFile;
+        private ToolStripMenuItem tsmiUpdateDataFromFile;
     }
 }
