@@ -2,6 +2,7 @@
 using KeenTimeKeeper.Forms;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace KeenTimeKeeper.Controls
 {
@@ -44,8 +45,8 @@ namespace KeenTimeKeeper.Controls
                 if (ctrl == lblTaskName)
                 {
                     var task = tasks.Find(prevText);
-                    if (task != null)
-                        task.TimeInSecs = timeInSecs;
+                    //if (task != null)
+                    //    task.TimeInSecs = timeInSecs;
                     frm.Tasks = tasks;
                     frm.SetToListMode();
                 }
@@ -68,9 +69,9 @@ namespace KeenTimeKeeper.Controls
                         if (task != null)
                             task.LastUsed = DateTime.Now;
                         else
-                            tasks.AddTasksRow(strFrmInput, Ds.TasksRow.DefaultTaskTimeInSecs, Ds.TasksRow.DefaultChunkMinutes, DateTime.Now, "");
+                            task = tasks.AddTasksRow(strFrmInput, Ds.TasksRow.DefaultTaskTimeInSecs, Ds.TasksRow.DefaultChunkMinutes, DateTime.Now, "");
                         CurrentTask = task;
-                        timeInSecs = CurrentTask != null ? CurrentTask.TimeInSecs : Ds.TasksRow.DefaultTaskTimeInSecs;
+                        //timeInSecs = CurrentTask != null ? CurrentTask.TimeInSecs : Ds.TasksRow.DefaultTaskTimeInSecs;
                     }
                 }
                 lastChangeTextClose = DateTime.Now;
@@ -90,7 +91,10 @@ namespace KeenTimeKeeper.Controls
 
         private void ResetTime()
         {
-            timeInSecs = 0;
+            var t = CurrentTask;
+            if (t == null)
+                return;
+            t.TimeInSecs = 0;
             DisplayTime();
         }
 
@@ -103,8 +107,11 @@ namespace KeenTimeKeeper.Controls
 
         private void LblCurrentChunkMinutes_MouseUp(object sender, MouseEventArgs e)
         {
+            var t = CurrentTask;
+            if (t == null)
+                return;
             ChangeText(lblCurrentChunkMinutes, e, true);
-            timeInSecs = int.Parse(lblChunkCount.Text) * TimeChunkMinutes * 60
+            t.TimeInSecs = int.Parse(lblChunkCount.Text) * TimeChunkMinutes * 60
                 + int.Parse(lblCurrentChunkMinutes.Text) * 60;
             DisplayTime();
         }
@@ -113,11 +120,14 @@ namespace KeenTimeKeeper.Controls
         {
             try
             {
+                var t = CurrentTask;
+                if (t == null)
+                    return;
                 var d = TimeChunkMinutes * 60;
                 if (e.Button == MouseButtons.Left)
-                    timeInSecs += d;
-                else if (e.Button == MouseButtons.Right && timeInSecs >= d)
-                    timeInSecs -= d;
+                    t.TimeInSecs += d;
+                else if (e.Button == MouseButtons.Right && t.TimeInSecs >= d)
+                    t.TimeInSecs -= d;
                 DisplayTime();
             }
             catch { MessageBox.Show("Invalid number format.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
@@ -125,8 +135,8 @@ namespace KeenTimeKeeper.Controls
 
         /// <summary>Indicates whether the timer is currently running.</summary>
         private bool isRunning = false;
-        /// <summary>Measured time in seconds.</summary>
-        private int timeInSecs;
+        ///// <summary>Measured time in seconds.</summary>
+        //private int timeInSecs;
 
         private int TimeChunkMinutes => (int)numTimeChunk.Value;
 
@@ -138,6 +148,8 @@ namespace KeenTimeKeeper.Controls
             timBtnStart.Start();
             isRunning = !isRunning;
             tim.Enabled = isRunning;
+            //if (CurrentTask != null)
+            //    CurrentTask.LastUsed = DateTime.Now;
             DisplayTime();
             if (isRunning)
                 OnStartTimerClicked();
@@ -152,11 +164,14 @@ namespace KeenTimeKeeper.Controls
         {
             if (isRunning)
             {
-                timeInSecs++;
+                var t = CurrentTask;
+                if (t == null)
+                    return;
+                t.TimeInSecs++;
                 DisplayTime();
-                var minutes = timeInSecs / 60;
+                var minutes = t.TimeInSecs / 60;
                 // Time chunk completed -> notify user by showing the main window and pause the timer
-                if (minutes > 0 && minutes % TimeChunkMinutes == 0 && timeInSecs % 60 == 0)
+                if (minutes > 0 && minutes % TimeChunkMinutes == 0 && t.TimeInSecs % 60 == 0)
                 {
                     System.Media.SystemSounds.Exclamation.Play();
                     OnTimerEnded();
@@ -167,13 +182,17 @@ namespace KeenTimeKeeper.Controls
 
         private void DisplayTime()
         {
-            var minutes = timeInSecs / 60;
+            var t = CurrentTask;
+            if (t == null)
+                return;
+            t.LastUsed = DateTime.Now;
+            var minutes = t.TimeInSecs / 60;
             var currChunkMinutes = minutes % TimeChunkMinutes;
             lblCurrentChunkMinutes.Text = (currChunkMinutes).ToString();
             lblChunkCount.Text = (minutes / TimeChunkMinutes).ToString();
-            btnStart.Text = isRunning ? "Pause" : (timeInSecs == 0 ? "Start" : "Resume");
+            btnStart.Text = isRunning ? "Pause" : (t.TimeInSecs == 0 ? "Start" : "Resume");
             var isItOn = isRunning;
-            lblTotalTime.Text = Utils.SecsToMS(timeInSecs);
+            lblTotalTime.Text = Utils.SecsToMS(t.TimeInSecs);
             lblTotalTime.BackColor = isItOn ? Color.LightGreen : Color.Yellow;
             if (FrmMain?.IsLoadFinished == true)
             {
@@ -208,6 +227,7 @@ namespace KeenTimeKeeper.Controls
 
         private Ds.TasksRow? currentTask;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Ds.TasksRow? CurrentTask
         {
             get => currentTask;
@@ -215,7 +235,7 @@ namespace KeenTimeKeeper.Controls
             {
                 currentTask = value;
                 lblTaskName.Text = (currentTask != null) ? currentTask.Name : Ds.TasksRow.DefaultTaskName;
-                timeInSecs = (currentTask != null) ? currentTask.TimeInSecs : Ds.TasksRow.DefaultTaskTimeInSecs;
+                //timeInSecs = (currentTask != null) ? currentTask.TimeInSecs : Ds.TasksRow.DefaultTaskTimeInSecs;
                 numTimeChunk.Value = (currentTask != null) ? currentTask.ChunkMinutes : Ds.TasksRow.DefaultChunkMinutes;
                 DisplayTime();
             }
@@ -223,13 +243,13 @@ namespace KeenTimeKeeper.Controls
 
         public override void SaveSettings(Ds ds)
         {
-            if (currentTask != null)
+            if (CurrentTask != null)
             {
-                currentTask.TimeInSecs = timeInSecs;
-                currentTask.ChunkMinutes = TimeChunkMinutes;
-                currentTask.LastUsed = DateTime.Now;
+                //currentTask.TimeInSecs = timeInSecs;
+                CurrentTask.ChunkMinutes = TimeChunkMinutes;
+                CurrentTask.LastUsed = DateTime.Now;
             }
-            ds.Settings.SaveSetting(nameof(CurrentTask), CurrentTask?.Name);
+            ds.Settings.WriteSetting(nameof(CurrentTask), CurrentTask?.Name);
         }
 
         public override void CtrlKeyUp(KeyEventArgs e)

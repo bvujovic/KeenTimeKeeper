@@ -29,6 +29,7 @@ namespace KeenTimeKeeper.Controls
 
         private readonly TimerKeeper timerKeeper = new();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string[] TimesList
         {
             get { return lstTimes.Items.Cast<string>().ToArray(); }
@@ -191,7 +192,7 @@ namespace KeenTimeKeeper.Controls
 
         public override void SaveSettings(Ds ds)
         {
-            ds.Settings.SaveSetting(nameof(TimesList), JsonSerializer.Serialize(TimesList));
+            ds.Settings.WriteSetting(nameof(TimesList), JsonSerializer.Serialize(TimesList));
         }
     }
 }

@@ -10,12 +10,19 @@ namespace KeenTimeKeeper
         {
             InitializeComponent();
             ctrlModes = [ctrlTimer, ctrlTimeOnTask, ctrlCurrentTime];
+            ribbon = new CtrlRibbon { Width = ClientSize.Width };
         }
+
+        private readonly CtrlRibbon ribbon;
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
             try
             {
+                MouseMove += ribbon.MouseMoveHandler;
+                ribbon.TopMostChanged += (s, isTopMost) => { TopMost = isTopMost; };
+                Controls.Add(ribbon);
+                ribbon.BringToFront();
                 ds.ReadXml(Data.GetDataSetFileName());
                 tsmiModesTimer.Tag = ctrlTimer;
                 tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
@@ -23,7 +30,7 @@ namespace KeenTimeKeeper
                 tsmiMminimizeOnStartTimer.DropDownItems.Clear();
                 var minOnStartTime = ds.Settings.ReadString(nameof(MinimizeOnStartTime)
                     , Enum.GetName(MinimizeOnStartTime.Never));
-                foreach (MinimizeOnStartTime mode in Enum.GetValues(typeof(MinimizeOnStartTime)))
+                foreach (MinimizeOnStartTime mode in Enum.GetValues<MinimizeOnStartTime>())
                 {
                     var item = new ToolStripMenuItem(mode.ToDisplayString())
                     {
@@ -109,7 +116,7 @@ namespace KeenTimeKeeper
             {
                 item.Checked = item == sender;
                 if (item == sender && item.Tag is MinimizeOnStartTime mode)
-                    ds.Settings.SaveSetting(nameof(MinimizeOnStartTime), Enum.GetName(mode));
+                    ds.Settings.WriteSetting(nameof(MinimizeOnStartTime), Enum.GetName(mode));
             }
         }
 
@@ -132,7 +139,7 @@ namespace KeenTimeKeeper
                 var ctrl = GetCurrentCtrl();
                 var strMode = ctrl != null ? ctrl.GetType().ToString() : string.Empty;
                 Data.UpdateDataSetFromFile(ds);
-                ds.Settings.SaveSetting(nameof(strMode), strMode);
+                ds.Settings.WriteSetting(nameof(strMode), strMode);
                 foreach (var c in ctrlModes)
                     c.SaveSettings(ds);
                 // Save position of the form - save distances from closer edges of the screen
@@ -140,12 +147,12 @@ namespace KeenTimeKeeper
                 {
                     var a = Screen.GetWorkingArea(this);
                     var right = a.X + a.Width - Right;
-                    ds.Settings.SaveSetting(nameof(Left), (Math.Min(Left, right)).ToString());
-                    ds.Settings.SaveSetting("XAxis", (Left < right ? nameof(Left) : nameof(Right)));
+                    ds.Settings.WriteSetting(nameof(Left), (Math.Min(Left, right)).ToString());
+                    ds.Settings.WriteSetting("XAxis", (Left < right ? nameof(Left) : nameof(Right)));
 
                     var bottom = a.Y + a.Height - Bottom;
-                    ds.Settings.SaveSetting(nameof(Top), (Math.Min(Top, bottom)).ToString());
-                    ds.Settings.SaveSetting("YAxis", (Top < bottom ? nameof(Top) : nameof(Bottom)));
+                    ds.Settings.WriteSetting(nameof(Top), (Math.Min(Top, bottom)).ToString());
+                    ds.Settings.WriteSetting("YAxis", (Top < bottom ? nameof(Top) : nameof(Bottom)));
                 }
                 ds.WriteXml(Data.GetDataSetFileName());
             }
@@ -173,14 +180,14 @@ namespace KeenTimeKeeper
                 var dh = initCtrlSize.Height - ctrl.Height;
                 this.Size = new Size(this.Width + dw, this.Height + dh);
             }
-            if (ctrl is CtrlCurrentTime && !TopMost)
-                SetTopMost(true, true);
-            if (ctrl is not CtrlCurrentTime && TopMost && turnOffTopMost)
-                SetTopMost(false, true);
+            //if (ctrl is CtrlCurrentTime && !TopMost)
+            //    SetTopMost(true, true);
+            //if (ctrl is not CtrlCurrentTime && TopMost && turnOffTopMost)
+            //    SetTopMost(false, true);
         }
 
         /// <summary>...</summary>
-        private bool turnOffTopMost = false;
+        //private bool turnOffTopMost = false;
 
         /// <summary>
         /// ...
@@ -189,16 +196,16 @@ namespace KeenTimeKeeper
         /// <param name="isAuto"></param>
         private void SetTopMost(bool isTopMost, bool isAuto)
         {
-            tsmiAlwaysOnTop.CheckedChanged -= TsmiAlwaysOnTop_CheckedChanged;
-            turnOffTopMost = isTopMost && isAuto;
-            TopMost = isTopMost;
-            tsmiAlwaysOnTop.Checked = isTopMost;
-            tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
+            //tsmiAlwaysOnTop.CheckedChanged -= TsmiAlwaysOnTop_CheckedChanged;
+            //turnOffTopMost = isTopMost && isAuto;
+            //TopMost = isTopMost;
+            //tsmiAlwaysOnTop.Checked = isTopMost;
+            //tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
         }
 
         private void TsmiAlwaysOnTop_CheckedChanged(object? sender, EventArgs e)
         {
-            SetTopMost(tsmiAlwaysOnTop.Checked, false);
+            //SetTopMost(tsmiAlwaysOnTop.Checked, false);
         }
 
         private void TimMinOnStartTimer_Tick(object sender, EventArgs e)
@@ -226,5 +233,30 @@ namespace KeenTimeKeeper
 
         private CtrlMode? GetCurrentCtrl()
             => this.pnlMain.Controls.Count > 0 ? this.pnlMain.Controls[0] as CtrlMode : null;
+
+        //private void FrmMain_MouseMove(object sender, MouseEventArgs e)
+        //{
+        //    if (e.Y <= RevealZoneHeight)
+        //        //ShowTopPanel();
+        //        ribbon.ShowToUser();
+        //    else
+        //        //HideTopPanelIfNeeded();
+        //        ribbon.HideFromUser();
+        //}
+
+        //void ShowTopPanel()
+        //{
+        //    if (ribbon!.Top < 0)
+        //        ribbon.Top = 0;
+        //}
+
+        //void HideTopPanelIfNeeded()
+        //{
+        //    if (ribbon is null) return;
+        //    if (!ribbon.Bounds.Contains(PointToClient(Cursor.Position)))
+        //        ribbon.Top = -ribbon.Height;
+        //}
+
+        private const int RevealZoneHeight = 20; // px from top
     }
 }

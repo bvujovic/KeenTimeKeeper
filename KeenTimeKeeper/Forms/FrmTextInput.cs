@@ -1,5 +1,6 @@
 ﻿using KeenTimeKeeper.Classes;
 using System.Data;
+using System.ComponentModel;
 
 namespace KeenTimeKeeper.Forms
 {
@@ -55,6 +56,7 @@ namespace KeenTimeKeeper.Forms
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Ds.TasksDataTable? Tasks { get; set; }
 
         private void CmbList_SelectedIndexChanged(object sender, EventArgs e)

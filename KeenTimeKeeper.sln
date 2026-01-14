@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeenTimeKeeper", "KeenTimeKeeper\KeenTimeKeeper.csproj", "{D658086A-B251-41F4-87BD-DCAB5FD9664F}"
 EndProject
@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ScreenShots", "ScreenShots", "{03E90CED-05A4-46EF-81F8-C78A8CE7F625}"
 	ProjectSection(SolutionItems) = preProject
+		ScreenShots\CurrentTime.png = ScreenShots\CurrentTime.png
 		ScreenShots\TimeOnTask.png = ScreenShots\TimeOnTask.png
 		ScreenShots\TimeOnTask_Modes.png = ScreenShots\TimeOnTask_Modes.png
 		ScreenShots\Timer.png = ScreenShots\Timer.png
