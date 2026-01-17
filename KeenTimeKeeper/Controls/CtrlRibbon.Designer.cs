@@ -28,82 +28,130 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CtrlRibbon));
             toolStrip = new ToolStrip();
-            btnModes = new ToolStripDropDownButton();
-            timerToolStripMenuItem = new ToolStripMenuItem();
-            timeOnTaskToolStripMenuItem = new ToolStripMenuItem();
-            currentTimeToolStripMenuItem = new ToolStripMenuItem();
-            btnOptions = new ToolStripDropDownButton();
+            tsmiModes = new ToolStripDropDownButton();
+            tsmiModesTimer = new ToolStripMenuItem();
+            tsmiModesTimeOnTask = new ToolStripMenuItem();
+            tsmiCurrentTime = new ToolStripMenuItem();
+            tsmiOptions = new ToolStripDropDownButton();
             tsmiAlwaysOnTop = new ToolStripMenuItem();
-            tsmiBatteryInfo = new ToolStripLabel();
+            tsmiMminimizeOnStartTimer = new ToolStripMenuItem();
+            tsmiCopyLocationOfDataFile = new ToolStripMenuItem();
+            tsmiUpdateDataFromFile = new ToolStripMenuItem();
+            lblBatteryInfo = new ToolStripLabel();
+            timBatteryInfoRegUpdate = new System.Windows.Forms.Timer(components);
+            timBatteryInfoDisplay = new System.Windows.Forms.Timer(components);
+            timHideIN = new System.Windows.Forms.Timer(components);
             toolStrip.SuspendLayout();
             SuspendLayout();
             // 
             // toolStrip
             // 
             toolStrip.GripStyle = ToolStripGripStyle.Hidden;
-            toolStrip.Items.AddRange(new ToolStripItem[] { btnModes, btnOptions, tsmiBatteryInfo });
+            toolStrip.Items.AddRange(new ToolStripItem[] { tsmiModes, tsmiOptions, lblBatteryInfo });
             toolStrip.Location = new Point(0, 0);
             toolStrip.Name = "toolStrip";
             toolStrip.Size = new Size(235, 25);
             toolStrip.TabIndex = 0;
             toolStrip.Text = "toolStrip1";
             // 
-            // btnModes
+            // tsmiModes
             // 
-            btnModes.AutoToolTip = false;
-            btnModes.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            btnModes.DropDownItems.AddRange(new ToolStripItem[] { timerToolStripMenuItem, timeOnTaskToolStripMenuItem, currentTimeToolStripMenuItem });
-            btnModes.ImageTransparentColor = Color.Magenta;
-            btnModes.Name = "btnModes";
-            btnModes.Size = new Size(56, 22);
-            btnModes.Text = "Modes";
-            btnModes.TextImageRelation = TextImageRelation.TextBeforeImage;
+            tsmiModes.AutoToolTip = false;
+            tsmiModes.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tsmiModes.DropDownItems.AddRange(new ToolStripItem[] { tsmiModesTimer, tsmiModesTimeOnTask, tsmiCurrentTime });
+            tsmiModes.ImageTransparentColor = Color.Magenta;
+            tsmiModes.Name = "tsmiModes";
+            tsmiModes.Size = new Size(56, 22);
+            tsmiModes.Text = "Modes";
+            tsmiModes.TextImageRelation = TextImageRelation.TextBeforeImage;
             // 
-            // timerToolStripMenuItem
+            // tsmiModesTimer
             // 
-            timerToolStripMenuItem.Name = "timerToolStripMenuItem";
-            timerToolStripMenuItem.Size = new Size(144, 22);
-            timerToolStripMenuItem.Text = "Timer";
+            tsmiModesTimer.Name = "tsmiModesTimer";
+            tsmiModesTimer.Size = new Size(144, 22);
+            tsmiModesTimer.Text = "Timer";
+            tsmiModesTimer.Click += TsmiModes_Click;
             // 
-            // timeOnTaskToolStripMenuItem
+            // tsmiModesTimeOnTask
             // 
-            timeOnTaskToolStripMenuItem.Name = "timeOnTaskToolStripMenuItem";
-            timeOnTaskToolStripMenuItem.Size = new Size(144, 22);
-            timeOnTaskToolStripMenuItem.Text = "Time on Task";
+            tsmiModesTimeOnTask.Name = "tsmiModesTimeOnTask";
+            tsmiModesTimeOnTask.Size = new Size(144, 22);
+            tsmiModesTimeOnTask.Text = "Time on Task";
+            tsmiModesTimeOnTask.Click += TsmiModes_Click;
             // 
-            // currentTimeToolStripMenuItem
+            // tsmiCurrentTime
             // 
-            currentTimeToolStripMenuItem.Name = "currentTimeToolStripMenuItem";
-            currentTimeToolStripMenuItem.Size = new Size(144, 22);
-            currentTimeToolStripMenuItem.Text = "Current Time";
+            tsmiCurrentTime.Name = "tsmiCurrentTime";
+            tsmiCurrentTime.Size = new Size(144, 22);
+            tsmiCurrentTime.Text = "Current Time";
+            tsmiCurrentTime.Click += TsmiModes_Click;
             // 
-            // btnOptions
+            // tsmiOptions
             // 
-            btnOptions.AutoToolTip = false;
-            btnOptions.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            btnOptions.DropDownItems.AddRange(new ToolStripItem[] { tsmiAlwaysOnTop });
-            btnOptions.Image = (Image)resources.GetObject("btnOptions.Image");
-            btnOptions.ImageTransparentColor = Color.Magenta;
-            btnOptions.Name = "btnOptions";
-            btnOptions.Size = new Size(62, 22);
-            btnOptions.Text = "Options";
+            tsmiOptions.AutoToolTip = false;
+            tsmiOptions.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tsmiOptions.DropDownItems.AddRange(new ToolStripItem[] { tsmiAlwaysOnTop, tsmiMminimizeOnStartTimer, tsmiCopyLocationOfDataFile, tsmiUpdateDataFromFile });
+            tsmiOptions.Image = (Image)resources.GetObject("tsmiOptions.Image");
+            tsmiOptions.ImageTransparentColor = Color.Magenta;
+            tsmiOptions.Name = "tsmiOptions";
+            tsmiOptions.Size = new Size(62, 22);
+            tsmiOptions.Text = "Options";
             // 
             // tsmiAlwaysOnTop
             // 
             tsmiAlwaysOnTop.CheckOnClick = true;
             tsmiAlwaysOnTop.Name = "tsmiAlwaysOnTop";
-            tsmiAlwaysOnTop.Size = new Size(151, 22);
+            tsmiAlwaysOnTop.Size = new Size(213, 22);
             tsmiAlwaysOnTop.Text = "Always on Top";
             tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
             // 
-            // tsmiBatteryInfo
+            // tsmiMminimizeOnStartTimer
             // 
-            tsmiBatteryInfo.Alignment = ToolStripItemAlignment.Right;
-            tsmiBatteryInfo.Name = "tsmiBatteryInfo";
-            tsmiBatteryInfo.Size = new Size(53, 22);
-            tsmiBatteryInfo.Text = "battery...";
+            tsmiMminimizeOnStartTimer.Name = "tsmiMminimizeOnStartTimer";
+            tsmiMminimizeOnStartTimer.Size = new Size(213, 22);
+            tsmiMminimizeOnStartTimer.Text = "Minimize on Start Timer";
+            // 
+            // tsmiCopyLocationOfDataFile
+            // 
+            tsmiCopyLocationOfDataFile.Name = "tsmiCopyLocationOfDataFile";
+            tsmiCopyLocationOfDataFile.Size = new Size(213, 22);
+            tsmiCopyLocationOfDataFile.Text = "Copy Location of Data File";
+            tsmiCopyLocationOfDataFile.Click += TsmiCopyLocationOfDataFile_Click;
+            // 
+            // tsmiUpdateDataFromFile
+            // 
+            tsmiUpdateDataFromFile.Name = "tsmiUpdateDataFromFile";
+            tsmiUpdateDataFromFile.Size = new Size(213, 22);
+            tsmiUpdateDataFromFile.Text = "Update Data from File";
+            tsmiUpdateDataFromFile.Visible = false;
+            tsmiUpdateDataFromFile.Click += TsmiUpdateDataFromFile_Click;
+            // 
+            // lblBatteryInfo
+            // 
+            lblBatteryInfo.Alignment = ToolStripItemAlignment.Right;
+            lblBatteryInfo.Name = "lblBatteryInfo";
+            lblBatteryInfo.Size = new Size(53, 22);
+            lblBatteryInfo.Text = "battery...";
+            lblBatteryInfo.Click += LblBatteryInfo_Click;
+            // 
+            // timBatteryInfoRegUpdate
+            // 
+            timBatteryInfoRegUpdate.Enabled = true;
+            timBatteryInfoRegUpdate.Interval = 60000;
+            timBatteryInfoRegUpdate.Tick += TimBatteryInfoRegUpdate_Tick;
+            // 
+            // timBatteryInfoDisplay
+            // 
+            timBatteryInfoDisplay.Interval = 500;
+            timBatteryInfoDisplay.Tick += TimBatteryInfoDisplay_Tick;
+            // 
+            // timHideIN
+            // 
+            timHideIN.Interval = 500;
+            timHideIN.Tick += TimHideIN_Tick;
             // 
             // CtrlRibbon
             // 
@@ -112,7 +160,6 @@
             Controls.Add(toolStrip);
             Name = "CtrlRibbon";
             Size = new Size(235, 26);
-            MouseLeave += CtrlRibbon_MouseLeave;
             toolStrip.ResumeLayout(false);
             toolStrip.PerformLayout();
             ResumeLayout(false);
@@ -123,12 +170,18 @@
 
         private ToolStrip toolStrip;
         private ToolStripButton toolStripButton2;
-        private ToolStripDropDownButton btnOptions;
-        private ToolStripLabel tsmiBatteryInfo;
-        private ToolStripDropDownButton btnModes;
-        private ToolStripMenuItem timerToolStripMenuItem;
-        private ToolStripMenuItem timeOnTaskToolStripMenuItem;
-        private ToolStripMenuItem currentTimeToolStripMenuItem;
+        private ToolStripDropDownButton tsmiOptions;
+        private ToolStripLabel lblBatteryInfo;
+        private ToolStripDropDownButton tsmiModes;
+        private ToolStripMenuItem tsmiModesTimer;
+        private ToolStripMenuItem tsmiModesTimeOnTask;
+        private ToolStripMenuItem tsmiCurrentTime;
         private ToolStripMenuItem tsmiAlwaysOnTop;
+        private System.Windows.Forms.Timer timBatteryInfoRegUpdate;
+        private ToolStripMenuItem tsmiMminimizeOnStartTimer;
+        private ToolStripMenuItem tsmiCopyLocationOfDataFile;
+        private ToolStripMenuItem tsmiUpdateDataFromFile;
+        private System.Windows.Forms.Timer timBatteryInfoDisplay;
+        private System.Windows.Forms.Timer timHideIN;
     }
 }

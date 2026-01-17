@@ -16,6 +16,8 @@ Windows desktop application for time tracking with progress shown in the taskbar
 ![Clock](ScreenShots/CurrentTime.png)
 
 ## TODO
-- [ ] (WIP) Add top panel (CtrlRibbon): appear/disappear, buttons/options, functionality, [battery info]
+- [x] Add top panel (CtrlRibbon): appear/disappear, buttons/options, functionality, battery info
+- [x] Add battery level notifications: 90, 85, 80%...
 - [ ] Add Installer
-- [ ] CtrlTimerOnTask could have an option for automatic click on Start/Resume button.
+- [ ] Test what happens when mode is switched and timer is ON
+- [ ] OPT CtrlTimerOnTask could have an option for automatic click on Start/Resume button.

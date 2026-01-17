@@ -9,7 +9,7 @@ namespace KeenTimeKeeper
         public FrmMain()
         {
             InitializeComponent();
-            ctrlModes = [ctrlTimer, ctrlTimeOnTask, ctrlCurrentTime];
+            //ctrlModes = [ctrlTimer, ctrlTimeOnTask, ctrlCurrentTime];
             ribbon = new CtrlRibbon { Width = ClientSize.Width };
         }
 
@@ -21,42 +21,47 @@ namespace KeenTimeKeeper
             {
                 MouseMove += ribbon.MouseMoveHandler;
                 ribbon.TopMostChanged += (s, isTopMost) => { TopMost = isTopMost; };
+                ribbon.ModeChanged += Ribbon_ModeChanged;
                 Controls.Add(ribbon);
                 ribbon.BringToFront();
                 ds.ReadXml(Data.GetDataSetFileName());
-                tsmiModesTimer.Tag = ctrlTimer;
-                tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
-                tsmiCurrentTime.Tag = ctrlCurrentTime;
-                tsmiMminimizeOnStartTimer.DropDownItems.Clear();
-                var minOnStartTime = ds.Settings.ReadString(nameof(MinimizeOnStartTime)
-                    , Enum.GetName(MinimizeOnStartTime.Never));
-                foreach (MinimizeOnStartTime mode in Enum.GetValues<MinimizeOnStartTime>())
-                {
-                    var item = new ToolStripMenuItem(mode.ToDisplayString())
-                    {
-                        Checked = Enum.GetName(mode) == minOnStartTime,
-                        CheckOnClick = true,
-                        Tag = mode
-                    };
-                    item.Click += TsmiMinimizeOnStartTimer_Click;
-                    tsmiMminimizeOnStartTimer.DropDownItems.Add(item);
-                }
-                var strMode = ds.Settings.ReadString("strMode", string.Empty);
-                if (strMode != null)
-                {
-                    // maybe some list/dict that would connect ctrlModes with ToolStripMenuItems would be better
-                    if (strMode.EndsWith(nameof(CtrlTimer)))
-                        tsmiModesTimer.PerformClick();
-                    else if (strMode.EndsWith(nameof(CtrlTimeOnTask)))
-                        tsmiModesTimeOnTask.PerformClick();
-                    else if (strMode.EndsWith(nameof(CtrlCurrentTime)))
-                        tsmiCurrentTime.PerformClick();
-                }
-                foreach (var ctrl in ctrlModes)
+                //tsmiModesTimer.Tag = ctrlTimer;
+                //tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
+                //tsmiCurrentTime.Tag = ctrlCurrentTime;
+                //tsmiMminimizeOnStartTimer.DropDownItems.Clear();
+                //var minOnStartTime = ds.Settings.ReadString(nameof(MinimizeOnStartTime)
+                //    , Enum.GetName(MinimizeOnStartTime.Never));
+                //foreach (MinimizeOnStartTime mode in Enum.GetValues<MinimizeOnStartTime>())
+                //{
+                //    var item = new ToolStripMenuItem(mode.ToDisplayString())
+                //    {
+                //        Checked = Enum.GetName(mode) == minOnStartTime,
+                //        CheckOnClick = true,
+                //        Tag = mode
+                //    };
+                //    item.Click += TsmiMinimizeOnStartTimer_Click;
+                //    tsmiMminimizeOnStartTimer.DropDownItems.Add(item);
+                //}
+                ribbon.LoadSettings(ds);
+                ribbon.BatteryLevelChanged += Ribbon_BatteryLevelChanged;
+                //var strMode = ds.Settings.ReadString("strMode", string.Empty);
+                //if (strMode != null)
+                //{
+                //    // maybe some list/dict that would connect ctrlModes with ToolStripMenuItems would be better
+                //    if (strMode.EndsWith(nameof(CtrlTimer)))
+                //        tsmiModesTimer.PerformClick();
+                //    else if (strMode.EndsWith(nameof(CtrlTimeOnTask)))
+                //        tsmiModesTimeOnTask.PerformClick();
+                //    else if (strMode.EndsWith(nameof(CtrlCurrentTime)))
+                //        tsmiCurrentTime.PerformClick();
+                //}
+                //foreach (var ctrl in ctrlModes)
+                foreach (var ctrl in ribbon.CtrlModes)
                 {
                     ctrl.LoadSettings(ds);
                     ctrl.StartTimerClicked += CtrlMode_StartTimerClicked;
                     ctrl.TimerEnded += CtrlMode_TimerEnded;
+                    //ctrl.MouseMove += ribbon.MouseMoveHandler;
                 }
                 // Set position of the form 
                 var a = Screen.GetWorkingArea(this);
@@ -71,30 +76,45 @@ namespace KeenTimeKeeper
             IsLoadFinished = true;
         }
 
+        private void Ribbon_BatteryLevelChanged(object? sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+            this.WindowState = FormWindowState.Normal;
+            this.Activate();
+            ribbon.ShowToUser();
+            System.Media.SystemSounds.Exclamation.Play();
+        }
+
         private void CtrlMode_StartTimerClicked(object? sender, EventArgs e)
         {
-            if (GetMinOnStartTime() != MinimizeOnStartTime.Never)
+            //if (GetMinOnStartTime() != MinimizeOnStartTime.Never)
+            //{
+            //    const int itvLilWait = 250;
+            //    var itv = GetMinOnStartTime() switch
+            //    {
+            //        MinimizeOnStartTime.Immediately => 1,
+            //        MinimizeOnStartTime.After1Sec => 1000 + itvLilWait,
+            //        MinimizeOnStartTime.After2Secs => 2000 + itvLilWait,
+            //        MinimizeOnStartTime.After5Secs => 5000 + itvLilWait,
+            //        _ => 0
+            //    };
+            //    if (itv > 0)
+            //    {
+            //        timMinOnStartTimer.Interval = itv;
+            //        timMinOnStartTimer.Start();
+            //    }
+            //}
+            var itv = ribbon.GetStartTimeInterval();
+            if (itv > 0)
             {
-                const int itvLilWait = 250;
-                var itv = GetMinOnStartTime() switch
-                {
-                    MinimizeOnStartTime.Immediately => 1,
-                    MinimizeOnStartTime.After1Sec => 1000 + itvLilWait,
-                    MinimizeOnStartTime.After2Secs => 2000 + itvLilWait,
-                    MinimizeOnStartTime.After5Secs => 5000 + itvLilWait,
-                    _ => 0
-                };
-                if (itv > 0)
-                {
-                    timMinOnStartTimer.Interval = itv;
-                    timMinOnStartTimer.Start();
-                }
+                timMinOnStartTimer.Interval = itv;
+                timMinOnStartTimer.Start();
             }
         }
 
         private void CtrlMode_TimerEnded(object? sender, EventArgs e)
         {
-            if (GetMinOnStartTime() != MinimizeOnStartTime.Never)
+            if (ribbon.GetMinOnStartTime() != MinimizeOnStartTime.Never)
             {
                 this.WindowState = FormWindowState.Minimized;
                 this.WindowState = FormWindowState.Normal;
@@ -102,33 +122,33 @@ namespace KeenTimeKeeper
             }
         }
 
-        private MinimizeOnStartTime GetMinOnStartTime()
-        {
-            foreach (ToolStripMenuItem item in tsmiMminimizeOnStartTimer.DropDownItems)
-                if (item.Checked && item.Tag is MinimizeOnStartTime mode)
-                    return mode;
-            return MinimizeOnStartTime.Never;
-        }
+        //private MinimizeOnStartTime GetMinOnStartTime()
+        //{
+        //    foreach (ToolStripMenuItem item in tsmiMminimizeOnStartTimer.DropDownItems)
+        //        if (item.Checked && item.Tag is MinimizeOnStartTime mode)
+        //            return mode;
+        //    return MinimizeOnStartTime.Never;
+        //}
 
-        private void TsmiMinimizeOnStartTimer_Click(object? sender, EventArgs e)
-        {
-            foreach (ToolStripMenuItem item in tsmiMminimizeOnStartTimer.DropDownItems)
-            {
-                item.Checked = item == sender;
-                if (item == sender && item.Tag is MinimizeOnStartTime mode)
-                    ds.Settings.WriteSetting(nameof(MinimizeOnStartTime), Enum.GetName(mode));
-            }
-        }
+        //private void TsmiMinimizeOnStartTimer_Click(object? sender, EventArgs e)
+        //{
+        //    foreach (ToolStripMenuItem item in tsmiMminimizeOnStartTimer.DropDownItems)
+        //    {
+        //        item.Checked = item == sender;
+        //        if (item == sender && item.Tag is MinimizeOnStartTime mode)
+        //            ds.Settings.WriteSetting(nameof(MinimizeOnStartTime), Enum.GetName(mode));
+        //    }
+        //}
 
         public bool IsLoadFinished { get; private set; } = false;
 
         private readonly Ds ds = new();
         public Ds DataSet => ds;
 
-        private readonly CtrlTimer ctrlTimer = new();
-        private readonly CtrlTimeOnTask ctrlTimeOnTask = new();
-        private readonly CtrlCurrentTime ctrlCurrentTime = new();
-        private readonly CtrlMode[] ctrlModes;
+        //private readonly CtrlTimer ctrlTimer = new();
+        //private readonly CtrlTimeOnTask ctrlTimeOnTask = new();
+        //private readonly CtrlCurrentTime ctrlCurrentTime = new();
+        //private readonly CtrlMode[] ctrlModes;
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -140,7 +160,8 @@ namespace KeenTimeKeeper
                 var strMode = ctrl != null ? ctrl.GetType().ToString() : string.Empty;
                 Data.UpdateDataSetFromFile(ds);
                 ds.Settings.WriteSetting(nameof(strMode), strMode);
-                foreach (var c in ctrlModes)
+                //foreach (var c in ctrlModes)
+                foreach (var c in ribbon.CtrlModes)
                     c.SaveSettings(ds);
                 // Save position of the form - save distances from closer edges of the screen
                 if (WindowState == FormWindowState.Normal)
@@ -159,27 +180,42 @@ namespace KeenTimeKeeper
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private void TsmiModes_Click(object sender, EventArgs e)
+        private void Ribbon_ModeChanged(object? sender, CtrlMode? ctrl)
         {
-            CtrlMode? ctrl = null;
-            if (sender is ToolStripMenuItem tsmi)
-                foreach (ToolStripMenuItem item in tsmiModes.DropDownItems)
-                {
-                    item.Checked = item == tsmi;
-                    if (item == tsmi)
-                        ctrl = item.Tag as CtrlMode;
-                }
-            this.pnlMain.Controls.Clear();
+            pnlMain.Controls.Clear();
             if (ctrl != null)
             {
-                this.Size = this.MinimumSize;
+                Size = MinimumSize;
                 var initCtrlSize = ctrl.Size;
                 ctrl.Dock = DockStyle.Fill;
-                this.pnlMain.Controls.Add(ctrl);
+                pnlMain.Controls.Add(ctrl);
                 var dw = initCtrlSize.Width - ctrl.Width;
                 var dh = initCtrlSize.Height - ctrl.Height;
-                this.Size = new Size(this.Width + dw, this.Height + dh);
+                Size = new Size(Width + dw, Height + dh);
             }
+        }
+
+        private void TsmiModes_Click(object sender, EventArgs e)
+        {
+            //CtrlMode? ctrl = null;
+            //if (sender is ToolStripMenuItem tsmi)
+            //    foreach (ToolStripMenuItem item in tsmiModes.DropDownItems)
+            //    {
+            //        item.Checked = item == tsmi;
+            //        if (item == tsmi)
+            //            ctrl = item.Tag as CtrlMode;
+            //    }
+            //this.pnlMain.Controls.Clear();
+            //if (ctrl != null)
+            //{
+            //    this.Size = this.MinimumSize;
+            //    var initCtrlSize = ctrl.Size;
+            //    ctrl.Dock = DockStyle.Fill;
+            //    this.pnlMain.Controls.Add(ctrl);
+            //    var dw = initCtrlSize.Width - ctrl.Width;
+            //    var dh = initCtrlSize.Height - ctrl.Height;
+            //    this.Size = new Size(this.Width + dw, this.Height + dh);
+            //}
             //if (ctrl is CtrlCurrentTime && !TopMost)
             //    SetTopMost(true, true);
             //if (ctrl is not CtrlCurrentTime && TopMost && turnOffTopMost)
@@ -194,14 +230,14 @@ namespace KeenTimeKeeper
         /// </summary>
         /// <param name="isTopMost"></param>
         /// <param name="isAuto"></param>
-        private void SetTopMost(bool isTopMost, bool isAuto)
-        {
-            //tsmiAlwaysOnTop.CheckedChanged -= TsmiAlwaysOnTop_CheckedChanged;
-            //turnOffTopMost = isTopMost && isAuto;
-            //TopMost = isTopMost;
-            //tsmiAlwaysOnTop.Checked = isTopMost;
-            //tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
-        }
+        //private void SetTopMost(bool isTopMost, bool isAuto)
+        //{
+        //    tsmiAlwaysOnTop.CheckedChanged -= TsmiAlwaysOnTop_CheckedChanged;
+        //    turnOffTopMost = isTopMost && isAuto;
+        //    TopMost = isTopMost;
+        //    tsmiAlwaysOnTop.Checked = isTopMost;
+        //    tsmiAlwaysOnTop.CheckedChanged += TsmiAlwaysOnTop_CheckedChanged;
+        //}
 
         private void TsmiAlwaysOnTop_CheckedChanged(object? sender, EventArgs e)
         {
@@ -216,16 +252,16 @@ namespace KeenTimeKeeper
 
         private void TsmiCopyLocationOfDataFile_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(Data.GetDataSetFileName() ?? "");
+            //Clipboard.SetText(Data.GetDataSetFileName() ?? "");
         }
 
         private void TsmiUpdateDataFromFile_Click(object sender, EventArgs e)
         {
-            try
-            {
-                Data.UpdateDataSetFromFile(ds);
-            }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            //try
+            //{
+            //    Data.UpdateDataSetFromFile(ds);
+            //}
+            //catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         private void FrmMain_KeyUp(object sender, KeyEventArgs e)
@@ -257,6 +293,6 @@ namespace KeenTimeKeeper
         //        ribbon.Top = -ribbon.Height;
         //}
 
-        private const int RevealZoneHeight = 20; // px from top
+        //private const int RevealZoneHeight = 20; // px from top
     }
 }
