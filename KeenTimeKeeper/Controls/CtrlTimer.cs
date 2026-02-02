@@ -186,13 +186,14 @@ namespace KeenTimeKeeper.Controls
 
         public override void LoadSettings(Ds ds)
         {
-            var times = ds.Settings.ReadString(nameof(TimesList), string.Empty)!;
+            //var times = ds.Settings.ReadString(nameof(TimesList), string.Empty)!;
+            var times = Bv.Shared.Core.Setts.ReadString(nameof(TimesList), string.Empty)!;
             LoadTimesList(times);
         }
 
         public override void SaveSettings(Ds ds)
         {
-            ds.Settings.WriteSetting(nameof(TimesList), JsonSerializer.Serialize(TimesList));
+            Bv.Shared.Core.Setts.WriteValue(nameof(TimesList), JsonSerializer.Serialize(TimesList));
         }
     }
 }

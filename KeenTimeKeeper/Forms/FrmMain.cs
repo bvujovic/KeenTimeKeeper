@@ -1,3 +1,4 @@
+using Bv.Shared.Core;
 using KeenTimeKeeper.Classes;
 using KeenTimeKeeper.Controls;
 using System.Diagnostics;
@@ -9,6 +10,8 @@ namespace KeenTimeKeeper
         public FrmMain()
         {
             InitializeComponent();
+            //MyData.Init("KeenTimeKeeper");
+            MyData.Init(Application.ProductName);
             //ctrlModes = [ctrlTimer, ctrlTimeOnTask, ctrlCurrentTime];
             ribbon = new CtrlRibbon { Width = ClientSize.Width };
         }
@@ -24,7 +27,8 @@ namespace KeenTimeKeeper
                 ribbon.ModeChanged += Ribbon_ModeChanged;
                 Controls.Add(ribbon);
                 ribbon.BringToFront();
-                ds.ReadXml(Data.GetDataSetFileName());
+                ds.ReadXml(MyData.GetDataSetFilePath());
+                Setts.Init(ds.Settings);
                 //tsmiModesTimer.Tag = ctrlTimer;
                 //tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
                 //tsmiCurrentTime.Tag = ctrlCurrentTime;
@@ -65,11 +69,13 @@ namespace KeenTimeKeeper
                 }
                 // Set position of the form 
                 var a = Screen.GetWorkingArea(this);
-                var xaxis = ds.Settings.ReadString("XAxis", nameof(Left));
-                var left = ds.Settings.ReadInt(nameof(Left), Left, it => it >= 0 && it < a.Width);
+                var xaxis = Setts.ReadString("XAxis", nameof(Left));
+                //var left = ds.Settings.ReadInt(nameof(Left), Left, it => it >= 0 && it < a.Width);
+                var left = Setts.ReadInt(nameof(Left), Left, it => it >= 0 && it < a.Width);
                 Left = (xaxis == nameof(Left)) ? left : (a.Width - left - Width);
-                var yaxis = ds.Settings.ReadString("YAxis", nameof(Top));
-                var top = ds.Settings.ReadInt(nameof(Top), Top, it => it >= 0 && it <= a.Height);
+                var yaxis = Setts.ReadString("YAxis", nameof(Top));
+                //var top = ds.Settings.ReadInt(nameof(Top), Top, it => it >= 0 && it <= a.Height);
+                var top = Setts.ReadInt(nameof(Top), Top, it => it >= 0 && it <= a.Height);
                 Top = (yaxis == nameof(Top)) ? top : (a.Height - top - Height);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -159,7 +165,7 @@ namespace KeenTimeKeeper
                 var ctrl = GetCurrentCtrl();
                 var strMode = ctrl != null ? ctrl.GetType().ToString() : string.Empty;
                 Data.UpdateDataSetFromFile(ds);
-                ds.Settings.WriteSetting(nameof(strMode), strMode);
+                Setts.WriteValue(nameof(strMode), strMode);
                 //foreach (var c in ctrlModes)
                 foreach (var c in ribbon.CtrlModes)
                     c.SaveSettings(ds);
@@ -168,14 +174,14 @@ namespace KeenTimeKeeper
                 {
                     var a = Screen.GetWorkingArea(this);
                     var right = a.X + a.Width - Right;
-                    ds.Settings.WriteSetting(nameof(Left), (Math.Min(Left, right)).ToString());
-                    ds.Settings.WriteSetting("XAxis", (Left < right ? nameof(Left) : nameof(Right)));
+                    Setts.WriteValue(nameof(Left), (Math.Min(Left, right)).ToString());
+                    Setts.WriteValue("XAxis", (Left < right ? nameof(Left) : nameof(Right)));
 
                     var bottom = a.Y + a.Height - Bottom;
-                    ds.Settings.WriteSetting(nameof(Top), (Math.Min(Top, bottom)).ToString());
-                    ds.Settings.WriteSetting("YAxis", (Top < bottom ? nameof(Top) : nameof(Bottom)));
+                    Setts.WriteValue(nameof(Top), (Math.Min(Top, bottom)).ToString());
+                    Setts.WriteValue("YAxis", (Top < bottom ? nameof(Top) : nameof(Bottom)));
                 }
-                ds.WriteXml(Data.GetDataSetFileName());
+                ds.WriteXml(MyData.GetDataSetFilePath());
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }

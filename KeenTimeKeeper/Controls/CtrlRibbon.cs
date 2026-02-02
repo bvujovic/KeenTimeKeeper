@@ -1,4 +1,5 @@
-﻿using Bv.Shared.WinForms;
+﻿using Bv.Shared.Core;
+using Bv.Shared.WinForms;
 using KeenTimeKeeper.Classes;
 using System.Diagnostics;
 
@@ -14,12 +15,12 @@ namespace KeenTimeKeeper.Controls
             Location = new Point(0, -Height); // hidden above form
             IsHidden = true;
             ctrlModes = [ctrlTimer, ctrlTimeOnTask, ctrlCurrentTime];
-            DisplayBatteryInfo();
             // For testing
-            //BatteryStatus.BatteryLevelNotifs = 
+            //BatteryStatus.Init(
             //    [99, 98, 97, 96, 95, 94, 93, 92, 91, 90
             //    , 89, 88, 87, 86, 85, 84, 83, 82, 81
-            //    , 80, 70, 60, 50, 40, 30, 20, 10, 5];
+            //    , 80, 70, 60, 50, 40, 30, 20, 10, 5]);
+            DisplayBatteryInfo();
         }
 
         private Ds ds;
@@ -28,7 +29,9 @@ namespace KeenTimeKeeper.Controls
         {
             this.ds = ds;
             tsmiMminimizeOnStartTimer.DropDownItems.Clear();
-            var minOnStartTime = ds.Settings.ReadString(nameof(MinimizeOnStartTime)
+            //var minOnStartTime = ds.Settings.ReadString(nameof(MinimizeOnStartTime)
+            //    , Enum.GetName(MinimizeOnStartTime.Never));
+            var minOnStartTime = Setts.ReadString(nameof(MinimizeOnStartTime)
                 , Enum.GetName(MinimizeOnStartTime.Never));
             foreach (MinimizeOnStartTime mode in Enum.GetValues<MinimizeOnStartTime>())
             {
@@ -44,7 +47,8 @@ namespace KeenTimeKeeper.Controls
             tsmiModesTimer.Tag = ctrlTimer;
             tsmiModesTimeOnTask.Tag = ctrlTimeOnTask;
             tsmiCurrentTime.Tag = ctrlCurrentTime;
-            var strMode = ds.Settings.ReadString("strMode", string.Empty);
+            //var strMode = ds.Settings.ReadString("strMode", string.Empty);
+            var strMode = Setts.ReadString("strMode", string.Empty);
             if (strMode != null)
             {
                 // maybe some list/dict that would connect ctrlModes with ToolStripMenuItems would be better
@@ -63,7 +67,7 @@ namespace KeenTimeKeeper.Controls
             {
                 item.Checked = item == sender;
                 if (item == sender && item.Tag is MinimizeOnStartTime mode)
-                    ds.Settings.WriteSetting(nameof(MinimizeOnStartTime), Enum.GetName(mode));
+                    Setts.WriteValue(nameof(MinimizeOnStartTime), Enum.GetName(mode));
             }
         }
 
@@ -175,8 +179,9 @@ namespace KeenTimeKeeper.Controls
 
         private void TimBatteryInfoRegUpdate_Tick(object sender, EventArgs e)
         {
-            DisplayBatteryInfo();
-            if (BatteryStatus.BatteryLevelNotif())
+            //DisplayBatteryInfo();
+            //if (BatteryStatus.BatteryLevelNotif())
+            if (DisplayBatteryInfo())
             {
                 BatteryLevelChanged?.Invoke(this, EventArgs.Empty);
                 lblBatteryInfo.ForeColor = Color.Red;
@@ -192,17 +197,18 @@ namespace KeenTimeKeeper.Controls
             lblBatteryInfo.ForeColor = SystemColors.ControlText;
         }
 
-        private void DisplayBatteryInfo()
+        private bool DisplayBatteryInfo()
         {
             lblBatteryInfo.Text = BatteryStatus.IsCharging ?
                 $"{BatteryStatus.BatteryLevel}%, Charging..." : $"Remaining {BatteryStatus.BatteryLevel}%";
+            return BatteryStatus.BatteryLevelNotif();
         }
 
         private void LblBatteryInfo_Click(object sender, EventArgs e)
         {
             DisplayBatteryInfo();
-            // This will prevent user from getting notif. for batt. level that he saw by refreshing lbl on click
-            BatteryStatus.BatteryLevelNotif(); 
+            //// This will prevent user from getting notif. for batt. level that he saw by refreshing lbl on click
+            //BatteryStatus.BatteryLevelNotif();
             lblBatteryInfo.ForeColor = Color.Red;
             timBatteryInfoDisplay.Interval = 200;
             timBatteryInfoDisplay.Start();
@@ -210,7 +216,11 @@ namespace KeenTimeKeeper.Controls
 
         private void TsmiCopyLocationOfDataFile_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(Data.GetDataSetFileName() ?? "");
+            try
+            {
+                Clipboard.SetText(MyData.GetDataSetFilePath());
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         private void TsmiUpdateDataFromFile_Click(object sender, EventArgs e)
@@ -239,23 +249,6 @@ namespace KeenTimeKeeper.Controls
                         ctrl = item.Tag as CtrlMode;
                 }
             ModeChanged?.Invoke(this, ctrl);
-            //this.pnlMain.Controls.Clear();
-            //if (ctrl != null)
-            //{
-            //    this.Size = this.MinimumSize;
-            //    var initCtrlSize = ctrl.Size;
-            //    ctrl.Dock = DockStyle.Fill;
-            //    this.pnlMain.Controls.Add(ctrl);
-            //    var dw = initCtrlSize.Width - ctrl.Width;
-            //    var dh = initCtrlSize.Height - ctrl.Height;
-            //    this.Size = new Size(this.Width + dw, this.Height + dh);
-            //}
-
-            //TODO activate this code!
-            //if (ctrl is CtrlCurrentTime && !TopMost)
-            //    SetTopMost(true, true);
-            //if (ctrl is not CtrlCurrentTime && TopMost && turnOffTopMost)
-            //    SetTopMost(false, true);
         }
 
         public EventHandler<CtrlMode?> ModeChanged;

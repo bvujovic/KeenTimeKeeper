@@ -215,7 +215,8 @@ namespace KeenTimeKeeper.Controls
         public override void LoadSettings(Ds ds)
         {
             tasks = ds.Tasks;
-            var taskName = ds.Settings.ReadString(nameof(CurrentTask), string.Empty)!;
+            //var taskName = ds.Settings.ReadString(nameof(CurrentTask), string.Empty)!;
+            var taskName = Bv.Shared.Core.Setts.ReadString(nameof(CurrentTask), string.Empty)!;
             //CurrentTask = FindTask(taskName);
             CurrentTask = tasks.Find(taskName);
         }
@@ -249,7 +250,7 @@ namespace KeenTimeKeeper.Controls
                 CurrentTask.ChunkMinutes = TimeChunkMinutes;
                 CurrentTask.LastUsed = DateTime.Now;
             }
-            ds.Settings.WriteSetting(nameof(CurrentTask), CurrentTask?.Name);
+            Bv.Shared.Core.Setts.WriteValue(nameof(CurrentTask), CurrentTask?.Name);
         }
 
         public override void CtrlKeyUp(KeyEventArgs e)

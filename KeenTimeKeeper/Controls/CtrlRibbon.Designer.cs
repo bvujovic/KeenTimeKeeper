@@ -169,7 +169,6 @@
         #endregion
 
         private ToolStrip toolStrip;
-        private ToolStripButton toolStripButton2;
         private ToolStripDropDownButton tsmiOptions;
         private ToolStripLabel lblBatteryInfo;
         private ToolStripDropDownButton tsmiModes;
