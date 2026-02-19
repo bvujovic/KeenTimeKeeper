@@ -1,5 +1,4 @@
-﻿using Bv.Shared.Core;
-using Bv.Shared.WinForms;
+﻿using Bv.Shared.WinForms;
 using KeenTimeKeeper.Classes;
 using System.Diagnostics;
 
@@ -199,6 +198,10 @@ namespace KeenTimeKeeper.Controls
 
         private bool DisplayBatteryInfo()
         {
+            if (!BatteryStatus.IsCharging)
+                using (var sw = new StreamWriter("battery_log.txt", true))
+                    sw.WriteLine($"{DateTime.Now}\t{BatteryStatus.BatteryLevel}\t{BatteryStatus.MinutesRemaining}");
+
             lblBatteryInfo.Text = BatteryStatus.IsCharging ?
                 $"{BatteryStatus.BatteryLevel}%, Charging..." : $"Remaining {BatteryStatus.BatteryLevel}%";
             return BatteryStatus.BatteryLevelNotif();
@@ -218,7 +221,7 @@ namespace KeenTimeKeeper.Controls
         {
             try
             {
-                Clipboard.SetText(MyData.GetDataSetFilePath());
+                Clipboard.SetText(OneDriveData.GetDataSetFilePath());
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
@@ -249,6 +252,13 @@ namespace KeenTimeKeeper.Controls
                         ctrl = item.Tag as CtrlMode;
                 }
             ModeChanged?.Invoke(this, ctrl);
+            if (this.Parent is FrmMain frmMain)
+            {
+                if (ctrl is CtrlCurrentTime && !frmMain.TopMost)
+                    SetTopMost(true, true);
+                if (ctrl is not CtrlCurrentTime && frmMain.TopMost && turnOffTopMost)
+                    SetTopMost(false, true);
+            }
         }
 
         public EventHandler<CtrlMode?> ModeChanged;

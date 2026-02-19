@@ -146,12 +146,18 @@ namespace KeenTimeKeeper.Controls
 
         private static void TimerBeep(int count = 1, int itv = 250)
         {
-            for (int i = 0; i < count; i++)
-            {
-                Console.Beep(1500, itv);
-                Thread.Sleep(itv);
-            }
+            //for (int i = 0; i < count; i++)
+            //{
+            //    Console.Beep(1500, itv);
+            //    Thread.Sleep(itv);
+            //}
+
+            //System.Media.SystemSounds.Exclamation.Play();
+
+            soundPlayer.Play();
         }
+
+        private static readonly System.Media.SoundPlayer soundPlayer = new(@"c:\Windows\Media\ringout.wav");
 
         private void BtnStartCancel_Click(object sender, EventArgs e)
         {
@@ -187,13 +193,13 @@ namespace KeenTimeKeeper.Controls
         public override void LoadSettings(Ds ds)
         {
             //var times = ds.Settings.ReadString(nameof(TimesList), string.Empty)!;
-            var times = Bv.Shared.Core.Setts.ReadString(nameof(TimesList), string.Empty)!;
+            var times = Setts.ReadString(nameof(TimesList), string.Empty)!;
             LoadTimesList(times);
         }
 
         public override void SaveSettings(Ds ds)
         {
-            Bv.Shared.Core.Setts.WriteValue(nameof(TimesList), JsonSerializer.Serialize(TimesList));
+            Setts.WriteValue(nameof(TimesList), JsonSerializer.Serialize(TimesList));
         }
     }
 }

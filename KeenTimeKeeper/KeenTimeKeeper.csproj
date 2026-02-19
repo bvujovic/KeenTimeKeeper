@@ -7,6 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>task_timer_icon.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,9 +23,11 @@
   <ItemGroup>
     <Reference Include="Bv.Shared.Core">
       <HintPath>..\..\BvShared\BvSharedCore\bin\Release\net10.0\Bv.Shared.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Bv.Shared.WinForms">
       <HintPath>..\..\BvShared\BvSharedWinForms\bin\Release\net10.0-windows\Bv.Shared.WinForms.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
 
